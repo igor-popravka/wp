@@ -1,0 +1,23 @@
+{
+  "name": "pis/wp",
+  "version": "0.0.01",
+  "description": "WordPress application",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Igor Popravka",
+      "email": "ipopravka@hotmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4",
+    "igor-popravka/WordPress-MyFXBook-Plugin": "dev-master"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/igor-popravka/WordPress-MyFXBook-Plugin"
+    }
+  ]
+}

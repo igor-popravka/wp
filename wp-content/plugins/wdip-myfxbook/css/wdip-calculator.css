@@ -1,0 +1,89 @@
+.wdip-calc-wrapper {
+    padding: 10px;
+    width: 100%;
+    min-width: 230px;
+    background-color: #F6F6F6;
+    border: solid 1px #8f9a9e;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.wdip-calc-wrapper .wdip-menu .show-graph {
+    float: right;
+    margin: 0;
+    font-weight: bold;
+}
+
+.wdip-calc-wrapper .wdip-result {
+    border: solid 1px #8f9a9e;
+    border-radius: 3px;
+    background-color: #EAF6FF;
+}
+
+.wdip-calc-wrapper .wdip-result div {
+    padding: 5px;
+}
+
+.wdip-calc-wrapper .wdip-result div:nth-child(even) {
+    background-color: #DDECF6;
+}
+
+.wdip-calc-wrapper .wdip-result label {
+    display: inline-block;
+    font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+    width: 50%;
+    margin: 0;
+    text-align: right;
+}
+
+.wdip-calc-wrapper .wdip-result span {
+    font-weight: bold;
+    display: inline-block;
+    width: 45%;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.wdip-calc-wrapper .wdip-result span.wdip-field-total {
+    color: #2d8ac7;
+}
+
+.wdip-calc-wrapper .wdip-result span.wdip-field-gain {
+    color: #7CA821;
+}
+
+.wdip-calc-wrapper .wdip-result span.wdip-field-fee {
+    color: #a94442;
+}
+
+.wdip-calc-wrapper .wdip-menu {
+    margin: 10px 0 5px 0;
+    position: relative;
+}
+
+.wdip-calc-wrapper .wdip-field {
+    margin-bottom: 5px;
+}
+
+.wdip-calc-wrapper .wdip-data label, .wdip-calc-wrapper .wdip-data input, .wdip-calc-wrapper .wdip-data select {
+    width: 100%;
+    margin: 0;
+    padding: 9px 5px;
+    text-align: left;
+    font-family: Lato, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+
+.wdip-calc-wrapper .wdip-data label{
+    font-weight: bold;
+    padding: 5px 5px 2px 5px;
+}
+
+.wdip-calc-wrapper .wdip-data .wdip-data-submit input {
+    margin-top: 10px;
+    padding: 10px;
+    text-align: center;
+}
+

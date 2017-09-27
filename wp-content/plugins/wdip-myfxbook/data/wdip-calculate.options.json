@@ -1,0 +1,47 @@
+{
+  "credits": {
+    "enabled": false
+  },
+  "chart": {
+    "backgroundColor": null,
+    "width": 579
+  },
+  "title": {
+    "text": ""
+  },
+  "tooltip": {
+    "valuePrefix": "$"
+  },
+  "xAxis": {
+    "categories": []
+  },
+  "yAxis": {
+    "title": {
+      "text": ""
+    },
+    "labels": {
+      "format": "${value}"
+    },
+    "gridLineColor": "#7A7F87"
+  },
+  "legend": {
+    "enabled": true
+  },
+  "series": [
+    {
+      "name": "Total",
+      "data": [],
+      "color": "#2D8AC7"
+    },
+    {
+      "name": "Gain",
+      "data": [],
+      "color": "#7CA821"
+    },
+    {
+      "name": "Fee",
+      "data": [],
+      "color": "#A94442"
+    }
+  ]
+}

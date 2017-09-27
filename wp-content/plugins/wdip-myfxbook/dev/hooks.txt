@@ -1,0 +1,15 @@
+<h3 align="center">Month by Month Growth (Quest)</h3>
+[myfxbook id="1231332,2090788" type="get-daily-gain" bgcolor="#FFFFFF" gridcolor="#465D86" filter="1" ]
+<br /><br />
+Explore how much the Quest fund has grown each month from the inception date.
+
+<h3 align="center">Total Growth (Quest)</h3>
+[myfxbook id="1231332,2090788" type="get-data-daily" bgcolor="#FFFFFF" gridcolor="#465D86" filter="1" ]
+<br /><br />
+Explore the growth of the Quest fund from the inception date. Use the sliders to zoom into specific time periods.
+
+<h3 align="center">Monthly Gain/Loss (Quest)</h3>
+[myfxbook id="1231332,2090788" type="get-monthly-gain-loss" bgcolor="#FFFFFF" gridcolor="#465D86" filter="1" ]
+
+<h3 align="center">Quest Growth Calculator</h3>
+[myfxbook id="1231332,2090788" type="get-calculator-form" fee="25,30" ]

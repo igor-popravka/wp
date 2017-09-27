@@ -1,29 +1,25 @@
 <?php
 
 
-
 /**
-
  * @author: igor.popravka
-
  * @link https://www.upwork.com/freelancers/~010854a54a1811f970 Author Profile
-
  * Date: 09.11.2016
-
  * Time: 14:32
-
  */
-
 class WDIP_MyFXBook_Plugin {
     const OPTIONS_GROUP = 'wdip-myfxbook-group';
     const OPTIONS_PAGE = 'wdip-myfxbook-page';
     const OPTIONS_NAME = 'options_name';
     const SHORT_CODE_NAME = 'myfxbook';
+    private static $dev = true;
     private static $instance;
     private static $session;
     private static $accounts = [];
+
     private function __construct() {
     }
+
     public static function instance() {
         if (!isset(self::$instance)) {
             self::$instance = new self;
@@ -53,6 +49,7 @@ class WDIP_MyFXBook_Plugin {
             $this->getCallback('renderOptionsPage')
         );
     }
+
     public function applyShortCode($attr = [], $content = null) {
         if (!isset($attr['type']) || !isset($attr['id'])) return $content;
         ob_start();
@@ -60,59 +57,60 @@ class WDIP_MyFXBook_Plugin {
         $attr['id'] = $ids[0];
         echo $content;
         try {
-            
-                switch ($attr['type']) {
-                    case 'get-daily-gain': //getdailyGain
-                    case 'get-data-daily': //getdataDaily
-                    case 'get-monthly-gain-loss':
-                        static $counter = 0;
-                        $id = md5("{$attr['type']}-{$attr['id']}-" . $counter++);
-                        $options = [
-                            'type' => $attr['type'],
-                            'data' => [],
-                            'title' => !empty($attr['title']) ? $attr['title'] : null,
-                            'height' => !empty($attr['height']) ? $attr['height'] : null,
-                            'width' => !empty($attr['width']) ? $attr['width'] : null,
-                            'bgcolor' => !empty($attr['bgcolor']) ? $attr['bgcolor'] : null,
-                            'gridcolor' => !empty($attr['gridcolor']) ? $attr['gridcolor'] : null,
-                            'filter' => !empty($attr['filter']) ? $attr['filter'] : 0
-                        ];
-                        $method = $this->getMethodByCode($attr['type']);
-                        $finalArray = [];
-                        $f_index = 0;
-                        foreach ($ids as $key => $uid) {
-                            $arr[$key] = $this->$method($uid);                             
-                            $finalArray = array_merge($finalArray, $this->$method($uid));
-                            if($key == 0){ //assumption only 2 accounts are there 
-                                $f_index = count($finalArray);
-                            }
+
+            switch ($attr['type']) {
+                case 'get-daily-gain': //getdailyGain
+                case 'get-data-daily': //getdataDaily
+                case 'get-monthly-gain-loss':
+                    static $counter = 0;
+                    $id = md5("{$attr['type']}-{$attr['id']}-" . $counter++);
+                    $options = [
+                        'type' => $attr['type'],
+                        'data' => [],
+                        'title' => !empty($attr['title']) ? $attr['title'] : null,
+                        'height' => !empty($attr['height']) ? $attr['height'] : null,
+                        'width' => !empty($attr['width']) ? $attr['width'] : null,
+                        'bgcolor' => !empty($attr['bgcolor']) ? $attr['bgcolor'] : null,
+                        'gridcolor' => !empty($attr['gridcolor']) ? $attr['gridcolor'] : null,
+                        'filter' => !empty($attr['filter']) ? $attr['filter'] : 0
+                    ];
+                    $method = $this->getMethodByCode($attr['type']);
+                    $finalArray = [];
+                    $f_index = 0;
+                    foreach ($ids as $key => $uid) {
+                        $arr[$key] = $this->$method($uid);
+                        $finalArray = array_merge($finalArray, $this->$method($uid));
+                        if ($key == 0) { //assumption only 2 accounts are there
+                            $f_index = count($finalArray);
                         }
-                        $options['data'] = $finalArray; 
-                        if($attr['type']!='get-monthly-gain-loss'){                            
-                            for($i=$f_index; $i<count($options['data']); $i++){
-                                $options['data'][$i]['y'] = $options['data'][$i-1]['y'] + $options['data'][$i]['y'];
-                            }                            
-                        }                        
-                        if (!empty($options['data'])) {
-                            require __DIR__ . '/views/wdip-myfxbook-chart.php';
+                    }
+                    $options['data'] = $finalArray;
+                    if ($attr['type'] != 'get-monthly-gain-loss') {
+                        for ($i = $f_index; $i < count($options['data']); $i++) {
+                            $options['data'][$i]['y'] = $options['data'][$i - 1]['y'] + $options['data'][$i]['y'];
                         }
-                        break;
-                    case 'get-calculator-form':
-                        $method = $this->getMethodByCode($attr['type']);
-                        $this->$method($attr);
-                }
-           
-            
+                    }
+                    if (!empty($options['data'])) {
+                        require __DIR__ . '/views/wdip-myfxbook-chart.php';
+                    }
+                    break;
+                case 'get-calculator-form':
+                    $method = $this->getMethodByCode($attr['type']);
+                    $this->$method($attr);
+            }
+
+
         } catch (\Exception $e) {
         }
         return ob_get_clean();
     }
 
-    function pr($a){
+    function pr($a) {
         echo "<hr><pre>";
         print_r($a);
         echo "</pre>";
     }
+
     public function initEnqueueScripts() {
         wp_enqueue_script('highcharts', plugins_url('/js/highcharts.js', __FILE__));
         wp_enqueue_script('wdip-myfxbook-chats', plugins_url('/js/wdip-myfxbook.chats.js', __FILE__), [
@@ -159,7 +157,7 @@ class WDIP_MyFXBook_Plugin {
                 submit_button('Save Settings');
                 ?>
             </form>
-            <?php if ($this->getSession()){ ?>
+            <?php if ($this->getSession()) { ?>
                 <h1>SortCode Generator</h1>
                 <div class="generation-fields">
                     <fieldset>
@@ -204,7 +202,8 @@ class WDIP_MyFXBook_Plugin {
                         <p class="grope calculate">
                             <label for="fee">Performance fee:</label>
                             <input name="fee" id="fee" type="text" value="" class="attr-field"/><br/>
-                            <span class="description" style="margin-left: 155px;">Enter numbers (1-100) separated comma</span>
+                            <span class="description"
+                                  style="margin-left: 155px;">Enter numbers (1-100) separated comma</span>
                         </p>
                     </fieldset>
                 </div>
@@ -322,7 +321,6 @@ class WDIP_MyFXBook_Plugin {
      * @param string $action
      * @param array $params
      * @return null|\stdClass
-
      */
     private function httpRequest($action, array $params) {
         $url = sprintf('https://www.myfxbook.com/%s?%s', $action, build_query($params));
@@ -339,18 +337,22 @@ class WDIP_MyFXBook_Plugin {
         $acc_info = $this->getAccountInfo($id);
         $series = [];
         if (!empty($acc_info)) {
-            $startDate = isset($start) ? $start : \DateTime::createFromFormat('m/d/Y H:i', $acc_info->firstTradeDate)->format('Y-m-d');
-            $endDate = (new \DateTime())->format('Y-m-d');
-            $result = $this->httpRequest('charts.json', [
-                'chartType' => 1,
-                'accountOid' => $id,
-                'startDate' => $startDate,
-                'endDate' => $endDate,
-                'showPips' => false,
-                'showChange' => true,
-                'showMain' => true
-            ]);
-            
+            if (self::$dev) {
+                $result = $this->getDataFromJSON('getDailyGain');
+            } else {
+                $startDate = isset($start) ? $start : \DateTime::createFromFormat('m/d/Y H:i', $acc_info->firstTradeDate)->format('Y-m-d');
+                $endDate = (new \DateTime())->format('Y-m-d');
+                $result = $this->httpRequest('charts.json', [
+                    'chartType' => 1,
+                    'accountOid' => $id,
+                    'startDate' => $startDate,
+                    'endDate' => $endDate,
+                    'showPips' => false,
+                    'showChange' => true,
+                    'showMain' => true
+                ]);
+            }
+
             if (isset($result->categories) && isset($result->series)) {
                 $array_keys = array_map(function ($vl) {
                     $vl = preg_replace("/^([a-z]{3})\s(\d{2}),\s'(\d{2})$/i", "$2-$1-20$3", $vl);
@@ -379,7 +381,7 @@ class WDIP_MyFXBook_Plugin {
                     ];
                 }
             }
-        }        
+        }
         return $series;
     }
 
@@ -556,9 +558,14 @@ class WDIP_MyFXBook_Plugin {
 
     private function getAccountsList() {
         if (empty(self::$accounts)) {
-            $result = $this->httpRequest('api/get-my-accounts.json', [
-                'session' => $this->getSession()
-            ]);
+            if (self::$dev) {
+                $result = $this->getDataFromJSON('getAccounts');
+            } else {
+                $result = $this->httpRequest('api/get-my-accounts.json', [
+                    'session' => $this->getSession()
+                ]);
+            }
+
             if (isset($result->accounts)) {
                 self::$accounts = $result->accounts;
             } else {
@@ -581,7 +588,7 @@ class WDIP_MyFXBook_Plugin {
         return '';
     }
 
-    private function renderAccountsList($accounts) {?>
+    private function renderAccountsList($accounts) { ?>
         <select name="id" id="account-list" class="attr-field">
             <?php foreach ($accounts as $acc) { ?>
                 <option value="<?= $acc->id; ?>"><?= $acc->name; ?> (<?= $acc->id; ?>)</option>
@@ -590,4 +597,9 @@ class WDIP_MyFXBook_Plugin {
         <?php
     }
 
+    private function getDataFromJSON($file) {
+        $path = __DIR__ . "/dev/{$file}.json";
+        $content = file_get_contents($path);
+        return json_decode($content);
+    }
 }

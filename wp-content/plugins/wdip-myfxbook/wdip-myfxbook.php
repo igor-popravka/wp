@@ -7,7 +7,9 @@
  * @Author URI:  https://www.upwork.com/freelancers/~010854a54a1811f970
  */
 
-require __DIR__ . '/class.wdip-myfxbook.php';
+require __DIR__ . '/wdip-bootstrap.php';
 
-WDIP_MyFXBook_Plugin::instance()->init();
-register_deactivation_hook(__FILE__, WDIP_MyFXBook_Plugin::instance()->getCallback('delSettings'));
+use WDIP\Plugin\MyFXBook;
+
+MyFXBook::instance()->build();
+register_deactivation_hook(__FILE__, MyFXBook::instance()->getCallback('delSettings'));

@@ -1,5 +1,5 @@
 <?php
-
+namespace WDIP\Plugin;
 
 /**
  * @author: igor.popravka
@@ -7,15 +7,32 @@
  * Date: 09.11.2016
  * Time: 14:32
  */
-class WDIP_MyFXBook_Plugin {
+class MyFXBook {
     const OPTIONS_GROUP = 'wdip-myfxbook-group';
     const OPTIONS_PAGE = 'wdip-myfxbook-page';
     const OPTIONS_NAME = 'options_name';
     const SHORT_CODE_NAME = 'myfxbook';
+
+    const SC_TYPE_DAILY_GAIN = 'daily-gain';
+    const SC_TYPE_DATA_DAILY = 'data-daily';
+    const SC_TYPE_MONTHLY_GAIN_LOSS = 'monthly-gain-loss';
+    const SC_TYPE_ALL_YIELDS = 'all-yields';
+    const SC_TYPE_CALCULATOR_FORM = 'calculator-form';
+
     private static $dev = true;
     private static $instance;
     private static $session;
     private static $accounts = [];
+
+    private $attributes = [];
+
+    public function getAttr($name) {
+        return $this->hasAttr($name) ? $this->attributes[$name] : '';
+    }
+
+    public function hasAttr($name) {
+        return isset($this->attributes[$name]);
+    }
 
     private function __construct() {
     }
@@ -27,7 +44,7 @@ class WDIP_MyFXBook_Plugin {
         return self::$instance;
     }
 
-    public function init() {
+    public function build() {
         if (is_admin()) {
             add_action('admin_menu', $this->getCallback('initAdminMenu'));
             add_action('admin_init', $this->getCallback('initSettings'));
@@ -51,66 +68,25 @@ class WDIP_MyFXBook_Plugin {
     }
 
     public function applyShortCode($attr = [], $content = null) {
-        if (!isset($attr['type']) || !isset($attr['id'])) return $content;
-        ob_start();
-        $ids = explode(',', $attr['id']);
-        $attr['id'] = $ids[0];
-        echo $content;
-        try {
+        $this->attributes = $attr;
 
-            switch ($attr['type']) {
-                case 'get-daily-gain': //getdailyGain
-                case 'get-data-daily': //getdataDaily
-                case 'get-monthly-gain-loss':
-                case 'get-all-yields':
-                    static $counter = 0;
-                    $id = md5("{$attr['type']}-{$attr['id']}-" . $counter++);
-                    $options = [
-                        'type' => $attr['type'],
-                        'data' => [],
-                        'title' => !empty($attr['title']) ? $attr['title'] : null,
-                        'height' => !empty($attr['height']) ? $attr['height'] : null,
-                        'width' => !empty($attr['width']) ? $attr['width'] : null,
-                        'bgcolor' => !empty($attr['bgcolor']) ? $attr['bgcolor'] : null,
-                        'gridcolor' => !empty($attr['gridcolor']) ? $attr['gridcolor'] : null,
-                        'filter' => !empty($attr['filter']) ? $attr['filter'] : 0
-                    ];
-                    //$method = $this->getMethodByCode($attr['type']);
-                    $method = 'getAllYields';
-                    $finalArray = [];
-                    $f_index = 0;
-                    foreach ($ids as $key => $uid) {
-                        //$arr[$key] = $this->$method($uid);
-                        $finalArray = array_merge($finalArray, $this->getAllYields($uid));
-                        if ($key == 0) { //assumption only 2 accounts are there
-                            $f_index = count($finalArray);
-                        }
-                    }
-                    $options['data'] = $finalArray;
-                    if ($attr['type'] != 'get-monthly-gain-loss') {
-                        for ($i = $f_index; $i < count($options['data']); $i++) {
-                            $options['data'][$i]['y'] = $options['data'][$i - 1]['y'] + $options['data'][$i]['y'];
-                        }
-                    }
-                    if (!empty($options['data'])) {
-                        require __DIR__ . '/views/wdip-myfxbook-chart.php';
-                    }
+        if ($this->hasAttr('type')) {
+            switch ($this->getAttr('type')) {
+                case self::SC_TYPE_DAILY_GAIN: //getdailyGain
+                case self::SC_TYPE_DATA_DAILY: //getdataDaily
+                case self::SC_TYPE_MONTHLY_GAIN_LOSS:
+                case self::SC_TYPE_ALL_YIELDS:
+                    $options = new ChartOptions($this->attributes);
+                    $content .= $this->getAllYields($options);
                     break;
                 case 'get-calculator-form':
-                    $method = $this->getMethodByCode($attr['type']);
-                    $this->$method($attr);
+                    /*$method = $this->getMethodByCode($attr['type']);
+                    $this->$method($attr);*/
+                    $content = '';
             }
-
-
-        } catch (\Exception $e) {
         }
-        return ob_get_clean();
-    }
 
-    function pr($a) {
-        echo "<hr><pre>";
-        print_r($a);
-        echo "</pre>";
+        return $content;
     }
 
     public function initEnqueueScripts() {
@@ -387,78 +363,38 @@ class WDIP_MyFXBook_Plugin {
         return $series;
     }
 
-    private function getAllYields($id, $start = null) {
-        $acc_info = $this->getAccountInfo($id);
-        $series = $result = [];
-        if (!empty($acc_info)) {
-            if (self::$dev) {
-                $result = $this->getDataFromJSON('getAllYields');
-            } else {
-                /*$startDate = isset($start) ? $start : \DateTime::createFromFormat('m/d/Y H:i', $acc_info->firstTradeDate)->format('Y-m-d');
-                $endDate = (new \DateTime())->format('Y-m-d');
-                $result = $this->httpRequest('charts.json', [
-                    'chartType' => 1,
-                    'accountOid' => $id,
-                    'startDate' => $startDate,
-                    'endDate' => $endDate,
-                    'showPips' => false,
-                    'showChange' => true,
-                    'showMain' => true
-                ]);*/
-            }
+    private function getAllYields(ChartOptions $options) {
+        $options->series = [];
 
-            if (isset($result->categories) && isset($result->series)) {
-
-                //Dec 21, '10
-                /*$array_keys = array_map(function ($vl) {
-                    $vl = preg_replace("/^([a-z]{3})\s(\d{2}),\s'(\d{2})$/i", "$2-$1-20$3", $vl);
-                    return \DateTime::createFromFormat('d-M-Y', $vl)->format('m/d/Y');
-                }, $result->categories);*/
-
-                $result->categories = array_map(function ($vl) {
-                    $date = \DateTime::createFromFormat("M d, 'y", $vl);
-                    return ['Y'=>$date->format('Y'), 'M'=>$date->format('m'), 'D'=>$date->format('d')];
-                }, $result->categories);
-
-                $series = $result->series;
-                $data = [];
-                foreach ($result->series as $item) {
-                    $item->data;
-                    for($i= 0; count($item->data); $i++){
-                        $item->data[$i] = [
-                            'x'=>$result->categories[$i],
-                            'y'=>$item->data[$i]
-                        ];
-                    }
-
-                }
-
-
-                /*$array_values = $array_keys = [];
-                foreach ($result->series as $item) {
-                    if ($item->name == 'Growth') {
-                        $array_values = $item->data;
-                        break;
-                    }
-                }
-                $chart_data = array_combine($array_keys, $array_values);
-                $group_chart_data = [];
-                foreach ($chart_data as $key => $val) {
-                    $key = \DateTime::createFromFormat('m/d/Y', $key)->format('m/01/Y');
-                    if (!isset($group_chart_data[$key])) {
-                        $group_chart_data[$key] = [];
-                    }
-                    array_push($group_chart_data[$key], floatval($val));
-                }
-                foreach ($group_chart_data as $x => $y) {
-                    $series[] = [
-                        'x' => $x,
-                        'y' => max($y)
-                    ];
-                }*/
-            }
+        if (self::$dev) {
+            $result = $this->getDataFromJSON('getAllYields');
+        } else {
+            $result = $this->httpRequest('getAllYields.json', [
+                'portfolioOid' => 248120
+            ]);
         }
-        return $result;
+
+        if (isset($result->categories) && isset($result->series)) {
+            $categories = array_map(function ($vl) {
+                $date = \DateTime::createFromFormat("M d, 'y", $vl);
+                return (object)['Y' => $date->format('Y'), 'M' => $date->format('m'), 'D' => $date->format('d')];
+            }, $result->categories);
+
+            foreach ($result->series as $i => $part) {
+                $options->series[$i] = (object)['name' => $part->name, 'data' => []];
+                foreach ($part->data as $j => $value) {
+                    $options->series[$i]->data[] = (object)[
+                        'x' => $categories[$j],
+                        'y' => $value
+                    ];
+                }
+            }
+
+            $viewer = new Viewer('myfxbook-chart', $options);
+            return $viewer->render();
+        }
+
+        return '';
     }
 
     private function getDataDaily($id) {

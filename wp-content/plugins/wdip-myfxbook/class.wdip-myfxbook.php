@@ -416,16 +416,21 @@ class WDIP_MyFXBook_Plugin {
                 }, $result->categories);*/
 
                 $result->categories = array_map(function ($vl) {
-                    return \DateTime::createFromFormat("M d, 'y", $vl);
+                    $date = \DateTime::createFromFormat("M d, 'y", $vl);
+                    return ['Y'=>$date->format('Y'), 'M'=>$date->format('m'), 'D'=>$date->format('d')];
                 }, $result->categories);
 
                 $series = $result->series;
-
+                $data = [];
                 foreach ($result->series as $item) {
-                    if ($item->name == 'Growth') {
-                        $array_values = $item->data;
-                        break;
+                    $item->data;
+                    for($i= 0; count($item->data); $i++){
+                        $item->data[$i] = [
+                            'x'=>$result->categories[$i],
+                            'y'=>$item->data[$i]
+                        ];
                     }
+
                 }
 
 

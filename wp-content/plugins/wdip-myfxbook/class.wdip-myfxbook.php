@@ -62,6 +62,7 @@ class WDIP_MyFXBook_Plugin {
                 case 'get-daily-gain': //getdailyGain
                 case 'get-data-daily': //getdataDaily
                 case 'get-monthly-gain-loss':
+                case 'get-all-yields':
                     static $counter = 0;
                     $id = md5("{$attr['type']}-{$attr['id']}-" . $counter++);
                     $options = [
@@ -74,12 +75,13 @@ class WDIP_MyFXBook_Plugin {
                         'gridcolor' => !empty($attr['gridcolor']) ? $attr['gridcolor'] : null,
                         'filter' => !empty($attr['filter']) ? $attr['filter'] : 0
                     ];
-                    $method = $this->getMethodByCode($attr['type']);
+                    //$method = $this->getMethodByCode($attr['type']);
+                    $method = 'getAllYields';
                     $finalArray = [];
                     $f_index = 0;
                     foreach ($ids as $key => $uid) {
-                        $arr[$key] = $this->$method($uid);
-                        $finalArray = array_merge($finalArray, $this->$method($uid));
+                        //$arr[$key] = $this->$method($uid);
+                        $finalArray = array_merge($finalArray, $this->getAllYields($uid));
                         if ($key == 0) { //assumption only 2 accounts are there
                             $f_index = count($finalArray);
                         }
@@ -385,6 +387,74 @@ class WDIP_MyFXBook_Plugin {
         return $series;
     }
 
+    private function getAllYields($id, $start = null) {
+        $acc_info = $this->getAccountInfo($id);
+        $series = $result = [];
+        if (!empty($acc_info)) {
+            if (self::$dev) {
+                $result = $this->getDataFromJSON('getAllYields');
+            } else {
+                /*$startDate = isset($start) ? $start : \DateTime::createFromFormat('m/d/Y H:i', $acc_info->firstTradeDate)->format('Y-m-d');
+                $endDate = (new \DateTime())->format('Y-m-d');
+                $result = $this->httpRequest('charts.json', [
+                    'chartType' => 1,
+                    'accountOid' => $id,
+                    'startDate' => $startDate,
+                    'endDate' => $endDate,
+                    'showPips' => false,
+                    'showChange' => true,
+                    'showMain' => true
+                ]);*/
+            }
+
+            if (isset($result->categories) && isset($result->series)) {
+
+                //Dec 21, '10
+                /*$array_keys = array_map(function ($vl) {
+                    $vl = preg_replace("/^([a-z]{3})\s(\d{2}),\s'(\d{2})$/i", "$2-$1-20$3", $vl);
+                    return \DateTime::createFromFormat('d-M-Y', $vl)->format('m/d/Y');
+                }, $result->categories);*/
+
+                $result->categories = array_map(function ($vl) {
+                    return \DateTime::createFromFormat("M d, 'y", $vl);
+                }, $result->categories);
+
+                $series = $result->series;
+
+                foreach ($result->series as $item) {
+                    if ($item->name == 'Growth') {
+                        $array_values = $item->data;
+                        break;
+                    }
+                }
+
+
+                /*$array_values = $array_keys = [];
+                foreach ($result->series as $item) {
+                    if ($item->name == 'Growth') {
+                        $array_values = $item->data;
+                        break;
+                    }
+                }
+                $chart_data = array_combine($array_keys, $array_values);
+                $group_chart_data = [];
+                foreach ($chart_data as $key => $val) {
+                    $key = \DateTime::createFromFormat('m/d/Y', $key)->format('m/01/Y');
+                    if (!isset($group_chart_data[$key])) {
+                        $group_chart_data[$key] = [];
+                    }
+                    array_push($group_chart_data[$key], floatval($val));
+                }
+                foreach ($group_chart_data as $x => $y) {
+                    $series[] = [
+                        'x' => $x,
+                        'y' => max($y)
+                    ];
+                }*/
+            }
+        }
+        return $result;
+    }
 
     private function getDataDaily($id) {
         $acc_info = $this->getAccountInfo($id);

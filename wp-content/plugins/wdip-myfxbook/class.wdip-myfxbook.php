@@ -30,6 +30,12 @@ class MyFXBook {
         return $this->hasAttr($name) ? $this->attributes[$name] : '';
     }
 
+    public function setAttr($name, $value) {
+        if ($this->hasAttr($name)) {
+            $this->attributes[$name] = $value;
+        }
+    }
+
     public function hasAttr($name) {
         return isset($this->attributes[$name]);
     }
@@ -70,14 +76,22 @@ class MyFXBook {
     public function applyShortCode($attr = [], $content = null) {
         $this->attributes = $attr;
 
-        if ($this->hasAttr('type')) {
+        if ($this->hasAttr('account-id') && $this->hasAttr('type')) {
             switch ($this->getAttr('type')) {
                 case self::SC_TYPE_DAILY_GAIN: //getdailyGain
                 case self::SC_TYPE_DATA_DAILY: //getdataDaily
                 case self::SC_TYPE_MONTHLY_GAIN_LOSS:
                 case self::SC_TYPE_ALL_YIELDS:
-                    $options = new ChartOptions($this->attributes);
-                    $content .= $this->getAllYields($options);
+                    $this->setAttr('account-id', explode(',', $this->getAttr('account-id')));
+                    $options = new Options($this->attributes);
+                    $options->month_tick_interval = 1000 * 3600 * 24 * 30;
+
+                    foreach ($options->account_id as $id) {
+                        $options->addSeries($this->getAllYields($id));
+                    }
+
+                    $viewer = new Viewer('myfxbook-chart', $options);
+                    $content .= $viewer->render();
                     break;
                 case 'get-calculator-form':
                     /*$method = $this->getMethodByCode($attr['type']);
@@ -92,6 +106,11 @@ class MyFXBook {
     public function initEnqueueScripts() {
         wp_enqueue_script('highcharts', plugins_url('/js/highcharts.js', __FILE__));
         wp_enqueue_script('wdip-myfxbook-chats', plugins_url('/js/wdip-myfxbook.chats.js', __FILE__), [
+            'jquery',
+            'jquery-ui-slider',
+            'highcharts'
+        ], null);
+        wp_enqueue_script('wdip-myfxbook-plagin', plugins_url('/js/wdip-myfxbook.plagin.js', __FILE__), [
             'jquery',
             'jquery-ui-slider',
             'highcharts'
@@ -142,7 +161,7 @@ class MyFXBook {
                         <legend>Attributes</legend>
                         <p>
                             <label for="account-list"><span>*</span> Account:</label>
-                            <?php $this->renderAccountsList($this->getAccountsList()) ?>
+                            <?php $this->renderAccountsList($this->getAccounts()) ?>
                         </p>
                         <p>
                             <label for="type-list"><span>*</span> Type:</label>
@@ -363,37 +382,38 @@ class MyFXBook {
         return $series;
     }
 
-    private function getAllYields(ChartOptions $options) {
-        $options->series = [];
-
-        if (self::$dev) {
-            $result = $this->getDataFromJSON('getAllYields');
-        } else {
-            $result = $this->httpRequest('getAllYields.json', [
-                'portfolioOid' => 248120
-            ]);
-        }
-
-        if (isset($result->categories) && isset($result->series)) {
-            $categories = array_map(function ($vl) {
-                $date = \DateTime::createFromFormat("M d, 'y", $vl);
-                return (object)['Y' => $date->format('Y'), 'M' => $date->format('m'), 'D' => $date->format('d')];
-            }, $result->categories);
-
-            foreach ($result->series as $i => $part) {
-                $options->series[$i] = (object)['name' => $part->name, 'data' => []];
-                foreach ($part->data as $j => $value) {
-                    $options->series[$i]->data[] = (object)[
-                        'x' => $categories[$j],
-                        'y' => $value
-                    ];
-                }
+    private function getAllYields($account_id) {
+        if ($account_info = $this->getAccountInfo($account_id)) {
+            if (self::$dev) {
+                $result = $this->getDataFromJSON('getDailyGainAPI');
+            } else {
+                $result = $this->httpRequest('api/get-daily-gain.json', [
+                    'session' => $this->getSession(),
+                    'id' => $account_id,
+                    'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
+                    'end' => (new \DateTime())->format('Y-m-d')
+                ]);
             }
 
-            $viewer = new Viewer('myfxbook-chart', $options);
-            return $viewer->render();
-        }
+            if (!$result->error) {
+                $series = (object)[
+                    'name' => $account_info->name,
+                    'data' => [],
+                    'color' => 'rgba(124, 181, 236, 0.7)',
+                    'negativeColor' => 'rgba(255, 79, 79, 0.7)'
+                ];
 
+                foreach ($result->dailyGain as $data) {
+                    $date = \DateTime::createFromFormat("m/d/Y", $data[0]->date);
+                    $series->data[] = (object)[
+                        'x' => (object)['Y' => $date->format('Y'), 'M' => $date->format('m'), 'D' => $date->format('d')],
+                        'y' => $data[0]->value
+                    ];
+                }
+
+                return $series;
+            }
+        }
         return '';
     }
 
@@ -480,7 +500,7 @@ class MyFXBook {
 
 
     private function getAccountInfo($id) {
-        foreach ($this->getAccountsList() as $acc) {
+        foreach ($this->getAccounts() as $acc) {
             if ($acc->id == $id) {
                 return $acc;
             }
@@ -567,20 +587,18 @@ class MyFXBook {
         return self::$session;
     }
 
-    private function getAccountsList() {
+    private function getAccounts() {
         if (empty(self::$accounts)) {
             if (self::$dev) {
-                $result = $this->getDataFromJSON('getAccounts');
+                $result = $this->getDataFromJSON('getMyAccountsAPI');
             } else {
                 $result = $this->httpRequest('api/get-my-accounts.json', [
                     'session' => $this->getSession()
                 ]);
             }
 
-            if (isset($result->accounts)) {
+            if (!$result->error) {
                 self::$accounts = $result->accounts;
-            } else {
-                self::$accounts = [];
             }
         }
         return self::$accounts;

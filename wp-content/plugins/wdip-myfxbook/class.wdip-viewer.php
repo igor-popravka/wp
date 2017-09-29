@@ -5,10 +5,10 @@ class Viewer {
     /** @var string */
     private $name;
 
-    /** @var ChartOptions */
+    /** @var Options */
     private $options;
 
-    public function __construct($name, ChartOptions $options) {
+    public function __construct($name, Options $options) {
         $this->name = $name;
         $this->options = $options;
     }
@@ -21,5 +21,9 @@ class Viewer {
             return ob_get_clean();
         }
         return '';
+    }
+
+    public function getOptions(){
+        return $this->options;
     }
 }

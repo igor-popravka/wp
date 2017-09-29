@@ -7,12 +7,12 @@
         normaliseSeriesData: function (options) {
             $(options.series).each(function (i, sr) {
                 $(sr.data).each(function (j, dt) {
-                    dt.x = Date.UTC(dt.Y, dt.M, dt.D);
+                    dt[0] = Date.UTC(dt[0].Y, dt[0].M, dt[0].D);
                 });
             });
         },
         getChartOptions: function (options) {
-           return plugin.getDailyGainOptions(options)
+            return plugin.getDailyGainOptions(options)
         },
         getDailyGainOptions: function (options) {
             return {
@@ -54,7 +54,7 @@
                     }
                 },
                 legend: {
-                    enabled: false
+                    enabled: true
                 },
                 plotOptions: {
                     column: {

@@ -114,7 +114,7 @@ class MyFXBook {
             'jquery',
             'jquery-ui-slider',
             'highcharts'
-        ], null);
+        ], 2);
         wp_enqueue_script('wdip-myfxbook-calculator', plugins_url('/js/wdip-myfxbook.calculator.js', __FILE__), [
             'jquery',
             'jquery-ui-dialog',
@@ -405,9 +405,9 @@ class MyFXBook {
 
                 foreach ($result->dailyGain as $data) {
                     $date = \DateTime::createFromFormat("m/d/Y", $data[0]->date);
-                    $series->data[] = (object)[
-                        'x' => (object)['Y' => $date->format('Y'), 'M' => $date->format('m'), 'D' => $date->format('d')],
-                        'y' => $data[0]->value
+                    $series->data[] = [
+                        ['Y' => intval($date->format('Y')), 'M' => intval($date->format('m')), 'D' => intval($date->format('d'))],
+                        $data[0]->value
                     ];
                 }
 

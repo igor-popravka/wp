@@ -1,0 +1,64 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "1617feb361109c9ace9fc52ac583c7f4",
+    "content-hash": "f0487856105a39be557723aa17770708",
+    "packages": [
+        {
+            "name": "austinhyde/iniparser",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/austinhyde/IniParser.git",
+                "reference": "3b5a925ac99619d198d8ff93958913ca3311f266"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/austinhyde/IniParser/zipball/3b5a925ac99619d198d8ff93958913ca3311f266",
+                "reference": "3b5a925ac99619d198d8ff93958913ca3311f266",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "IniParser": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Till Klampaeckel",
+                    "email": "till@php.net",
+                    "homepage": "http://till.klampaeckel.de/"
+                },
+                {
+                    "name": "Austin Hyde",
+                    "email": "austin109@gmail.com"
+                }
+            ],
+            "description": "A Zend_Config_Ini like parser for .ini files.",
+            "keywords": [
+                "configuration"
+            ],
+            "time": "2014-04-12 14:28:42"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "austinhyde/iniparser": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": " >= 5.4"
+    },
+    "platform-dev": []
+}

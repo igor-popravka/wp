@@ -1,0 +1,45 @@
+[
+    {
+        "name": "austinhyde/iniparser",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/austinhyde/IniParser.git",
+            "reference": "3b5a925ac99619d198d8ff93958913ca3311f266"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/austinhyde/IniParser/zipball/3b5a925ac99619d198d8ff93958913ca3311f266",
+            "reference": "3b5a925ac99619d198d8ff93958913ca3311f266",
+            "shasum": ""
+        },
+        "time": "2014-04-12 14:28:42",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "IniParser": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Till Klampaeckel",
+                "email": "till@php.net",
+                "homepage": "http://till.klampaeckel.de/"
+            },
+            {
+                "name": "Austin Hyde",
+                "email": "austin109@gmail.com"
+            }
+        ],
+        "description": "A Zend_Config_Ini like parser for .ini files.",
+        "keywords": [
+            "configuration"
+        ]
+    }
+]

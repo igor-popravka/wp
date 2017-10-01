@@ -1,15 +1,15 @@
 <?php
 /**
- * @Plugin Name: MyFXBook Plugin
- * @Description: MyFXBook Plugin, which builds charts/graphs using the data from  API <a href="https://www.myfxbook.com/api">https://www.myfxbook.com/api</a>
- * @Version:     1.6.7
+ * @Plugin Name: MyFXBookClient
+ * @Description: MyFXBookClient plugin, which builds charts/graphs using the data from  API <a href="https://www.myfxbook.com/api">https://www.myfxbook.com/api</a>
+ * @Version:     2.0.0
  * @Author:      Web Developer Igor P.
  * @Author URI:  https://www.upwork.com/freelancers/~010854a54a1811f970
  */
 
-require __DIR__ . '/wdip-bootstrap.php';
+define("WDIP_ROOT", __DIR__);
+define("WDIP_PLUGIN", __FILE__);
 
-use WDIP\Plugin\MyFXBook;
+require WDIP_ROOT . '/vendor/autoload.php';
 
-MyFXBook::instance()->build();
-register_deactivation_hook(__FILE__, MyFXBook::instance()->getCallback('delSettings'));
+\WDIP\Plugin\MyFXBookClient::instance()->build();

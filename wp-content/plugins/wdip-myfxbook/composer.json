@@ -1,0 +1,23 @@
+{
+    "name": "wdip/myfxbook",
+    "version": "2.0.0",
+    "type": "library",
+    "description": "MyFxBook WordPress plugin",
+    "time": "2017-09-30",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Igor Popravka",
+            "email": "ipopravka@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": " >= 5.4",
+        "austinhyde/iniparser": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "WDIP\\Plugin\\": "lib/"
+        }
+    }
+}

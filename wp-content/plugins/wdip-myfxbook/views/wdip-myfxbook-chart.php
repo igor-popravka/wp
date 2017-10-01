@@ -1,6 +1,6 @@
 <?php
 /** @var \WDIP\Plugin\Viewer $this */
-/** @var \WDIP\Plugin\Options $options */
+/** @var \WDIP\Plugin\ChartOptions $options */
 
 $options = $this->getOptions();
 ?>
@@ -8,6 +8,7 @@ $options = $this->getOptions();
 <div id="<?= $options->uid; ?>" class="wdip-myfxbook-chart"></div>
 <script>
     (function ($) {
-        $('#<?= $options->uid; ?>').myFxBook(JSON.parse('<?= $options->toJSON(); ?>'));
+        var options = '<?= $options->toJSON(); ?>';
+        $('#<?= $options->uid; ?>').myFxBook(JSON.parse(options));
     })(jQuery);
 </script>

@@ -1,4 +1,11 @@
-<div id="<?php echo $code; ?>" class="wdip-calc-wrapper">
+<?php
+/** @var \WDIP\Plugin\Viewer $this */
+/** @var \WDIP\Plugin\ChartOptions $options */
+
+$options = $this->getOptions();
+?>
+
+<div id="<?= $options->uid; ?>" class="wdip-calc-wrapper">
     <div class="wdip-result">
         <div>
             <label>Total amount:</label>
@@ -39,12 +46,14 @@
     </div>
 </div>
 <script>
-    jQuery(document).ready(function ($) {
-        $('#<?php echo $code; ?>').FXCalculator({
-            fee: [<?php echo $attr['fee']; ?>],
-            accID: '<?php echo $attr['id']; ?>',
-            url: '<?php echo $admin_url; ?>',
-            chart_options: JSON.parse('<?php echo $chart_options; ?>')
-        });
-    });
+    (function ($) {
+        var options = {
+            fee: JSON.parse('<?= json_encode($options->fee); ?>'),
+            accID: JSON.parse('<?= json_encode($options->accountid); ?>'),
+            url: '<?= $options->adminUrl; ?>',
+            chart_options: JSON.parse('<?= $options->CalcFormOptions->toJSON(); ?>')
+        };
+        console.log(options);
+        $('#<?= $options->uid ?>').FXCalculator(options);
+    })(jQuery);
 </script>

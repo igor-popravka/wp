@@ -1,4 +1,54 @@
-jQuery(document).ready(function ($) {
+(function ($) {
+    function getChartOptions() {
+        return {
+            credits: {
+                enabled: false
+            },
+            chart: {
+                backgroundColor: null,
+                width: 579
+            },
+            title: {
+                text: ""
+            },
+            tooltip: {
+                valuePrefix: "$"
+            },
+            xAxis: {
+                categories: []
+            },
+            yAxis: {
+                title: {
+                    text: ""
+                },
+                labels: {
+                    format: "${value}"
+                },
+                gridLineColor: "#7A7F87"
+            },
+            legend: {
+                enabled: true
+            },
+            series: [
+                {
+                    name: "Total",
+                    data: [],
+                    color: "#2D8AC7"
+                },
+                {
+                    name: "Gain",
+                    data: [],
+                    color: "#7CA821"
+                },
+                {
+                    name: "Fee",
+                    data: [],
+                    color: "#A94442"
+                }
+            ]
+        };
+    }
+
     $.fn.FXCalculator = function (options) {
         var context = this,
             opt = $.extend({
@@ -18,7 +68,8 @@ jQuery(document).ready(function ($) {
         $('.show-graph', context).button().on('click', function () {
             if (context.data('series_data')) {
                 var el = $('<div>').css({display: "none"}).appendTo(context),
-                    chart = Highcharts.chart(el[0], opt.chart_options),
+                    chart_options = getChartOptions(),
+                    chart = Highcharts.chart(el[0], chart_options),
                     series = context.data('series_data');
 
                 chart.xAxis[0].setCategories(series.categories);
@@ -28,7 +79,7 @@ jQuery(document).ready(function ($) {
 
                 el.dialog({
                     title: "Calculation result into graph",
-                    width: opt.chart_options.chart.width + 50
+                    width: chart_options.chart.width + 50
                 });
             }
         });
@@ -57,7 +108,7 @@ jQuery(document).ready(function ($) {
         $('form', context).submit(function (e) {
             e.preventDefault();
             $.post(opt.url, $.extend({
-                action: 'wdip-calculate',
+                action: 'wdip-calculate-growth-data',
                 id: opt.accID
             }, context.data('post_data')), function (result) {
                 var series = null;
@@ -82,4 +133,4 @@ jQuery(document).ready(function ($) {
             return false;
         });
     }
-});
+})(jQuery);

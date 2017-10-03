@@ -55,7 +55,7 @@
                     }
                 },
                 legend: {
-                    enabled: true
+                    enabled: false
                 },
                 plotOptions: {
                     column: {
@@ -126,7 +126,7 @@
                     }
                 },
                 legend: {
-                    enabled: true
+                    enabled: false
                 },
                 plotOptions: {
                     areaspline: {

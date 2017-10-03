@@ -2,7 +2,7 @@
 /**
  * @Plugin Name: MyFXBookClient
  * @Description: MyFXBookClient plugin, which builds charts/graphs using the data from  API <a href="https://www.myfxbook.com/api">https://www.myfxbook.com/api</a>
- * @Version:     2.0.0
+ * @Version:     2.0.1
  * @Author:      Web Developer Igor P.
  * @Author URI:  https://www.upwork.com/freelancers/~010854a54a1811f970
  */

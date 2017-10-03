@@ -20,7 +20,7 @@ class MyFXBookClient {
 
     const ENV_DEV = 'dev';
     const ENV_LIVE = 'live';
-    
+
     private static $instance;
     private static $session;
     private static $accounts = [];
@@ -104,7 +104,7 @@ class MyFXBookClient {
     }
 
     public function renderOptionsPage() {
-        if (current_user_can('manage_options')){
+        if (current_user_can('manage_options')) {
             Viewer::instance()->output('options-page');
         }
     }
@@ -243,10 +243,16 @@ class MyFXBookClient {
                     'end' => (new \DateTime())->format('Y-m-d')
                 ]);
                 if (!$result->error) {
+                    if (empty($dailyGainData)) {
+                        $start_value = 0;
+                    } else {
+                        $start_value = $dailyGainData[count($dailyGainData) - 1][1];
+                    }
+
                     foreach ($result->dailyGain as $data) {
                         $dailyGainData[] = [
                             \DateTime::createFromFormat('m/d/Y', $data[0]->date)->format('M, y'),
-                            $data[0]->value
+                            $start_value + $data[0]->value
                         ];
                     }
                 }
@@ -320,17 +326,17 @@ class MyFXBookClient {
         $content = file_get_contents($path);
         return json_decode($content);
     }
-    
-    public function getVersion(){
+
+    public function getVersion() {
         if (!isset(self::$version)) {
             $plugin = $this->getDataFromJSON('composer');
             self::$version = $plugin->version;
         }
-        
+
         return self::$version;
     }
-    
-    public function getEnvironment(){
+
+    public function getEnvironment() {
         return MyFXBookConfig::instance()->environment;
     }
 }

@@ -41,13 +41,13 @@ class ChartOptions extends MyFXBookData {
         switch ($this->charttype) {
             case MFBClient::TYPE_MONTH_GROWTH:
             case MFBClient::TYPE_TOTAL_GROWTH:
-                foreach ($this->accountid as $index => $id) {
-                    $this->addGrowthSeries($index, $id);
+                foreach ($this->accountid as $id) {
+                    $this->addGrowthSeries($id);
                 }
                 break;
             case MFBClient::TYPE_MONTHLY_GAIN_LOSS:
-                foreach ($this->accountid as $index => $id) {
-                    $this->addMonthlyGainLossSeries($index, $id);
+                foreach ($this->accountid as $id) {
+                    $this->addMonthlyGainLossSeries($id);
                 }
                 break;
             case MFBClient::TYPE_CALCULATOR_FORM:
@@ -78,7 +78,7 @@ class ChartOptions extends MyFXBookData {
         ];
     }
 
-    private function addGrowthSeries($index, $account_id) {
+    private function addGrowthSeries($account_id) {
         if ($account_info = MFBClient::instance()->getAccountInfo($account_id)) {
             $daily_gain = MFBConfig::instance()->SERIES->daily_gain;
             $result = MFBClient::instance()->httpRequest($daily_gain->url, [
@@ -89,13 +89,6 @@ class ChartOptions extends MyFXBookData {
             ]);
 
             if (!$result->error) {
-                $series = [
-                    'name' => $account_info->name,
-                    'data' => [],
-                    'color' => $daily_gain->color[$index],
-                    'negativeColor' => $daily_gain->negativeColor[$index]
-                ];
-
                 $dailyGainData = [];
                 foreach ($result->dailyGain as $data) {
                     if ($this->charttype == MFBClient::TYPE_MONTH_GROWTH) {
@@ -111,32 +104,50 @@ class ChartOptions extends MyFXBookData {
                     $dailyGainData["uts_{$utc}"]['value'] [] = $data[0]->value;
                 }
 
+                if (empty($this->series)) {
+                    $series = [[
+                        'name' => 'Quest',
+                        'data' => [],
+                        'color' => 'rgba(124, 181, 236, 0.7)',
+                        'negativeColor' => 'rgba(255, 79, 79, 0.7)'
+                    ]];
+
+                    $start_value = 0;
+                } else {
+                    $series = $this->series;
+                    $start_value = $series[0]['data'][count($series[0]['data']) - 1][1];
+                }
+
                 foreach ($dailyGainData as $data) {
-                    $series['data'][] = [
+                    $series[0]['data'][] = [
                         $data['uts'],
-                        min($data['value']) < 0 ? min($data['value']) : max($data['value'])
+                        ($start_value + (min($data['value']) < 0 ? min($data['value']) : max($data['value'])))
                     ];
                 }
 
-                $origin_series = $this->series;
-                $origin_series[] = $series;
-                $this->series = $origin_series;
+                $this->series = $series;
             }
         }
     }
 
-    private function addMonthlyGainLossSeries($index, $account_id) {
+    private function addMonthlyGainLossSeries($account_id) {
         if ($account_info = MFBClient::instance()->getAccountInfo($account_id)) {
             $monthly_gain_los = MFBConfig::instance()->SERIES->monthly_gain_los;
 
-            $series = [
-                'name' => $account_info->name,
-                'data' => [],
-                'color' => $monthly_gain_los->color[$index],
-                'negativeColor' => $monthly_gain_los->negativeColor[$index]
-            ];
-            $series_data = [];
+            if (empty($this->series)) {
+                $series = [[
+                    'name' => 'Quest',
+                    'data' => [],
+                    'color' => 'rgba(124, 181, 236, 0.7)',
+                    'negativeColor' => 'rgba(255, 79, 79, 0.7)'
+                ]];
 
+                $start_value = 0;
+            } else {
+                $series = $this->series;
+                $start_value = $series[0]['data'][count($series[0]['data']) - 1][1];
+            }
+            
             $countYear = \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y');
             $endYear = (new \DateTime())->format('Y');
             $endDate = (new \DateTime())->modify('last day of this month')->format('Y-m-d');
@@ -156,21 +167,18 @@ class ChartOptions extends MyFXBookData {
                     $values = array_map(function ($item) {
                         return array_shift($item);
                     }, $result->series[0]->data);
-                    $series_data = array_merge($series_data, array_combine($keys, $values));
+
+                    for ($i = 0; $i < count($keys); $i++) {
+                        $series[0]['data'][] = [
+                            $keys[$i] * 1,
+                            $start_value + $values[$i]
+                        ];
+                    }
                 }
                 $countYear++;
             }
 
-            foreach ($series_data as $utc => $value) {
-                $series['data'][] = [
-                    $utc * 1,
-                    $value
-                ];
-            }
-
-            $origin_series = $this->series;
-            $origin_series[] = $series;
-            $this->series = $origin_series;
+            $this->series = $series;
         }
     }
 }

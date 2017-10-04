@@ -8,9 +8,9 @@ namespace WDIP\Plugin;
  * Time: 14:32
  */
 class MyFXBookClient {
-    const OPTIONS_GROUP = 'wdip-myfxbook-group';
-    const OPTIONS_PAGE = 'wdip-myfxbook-page';
-    const OPTIONS_NAME = 'options_name';
+    const OPTIONS_GROUP = 'wdip-myfxbook-client-group';
+    const OPTIONS_PAGE = 'wdip-myfxbook-clien-page';
+    const OPTIONS_NAME = 'wdip-myfxbook-clien-options';
     const SHORT_CODE_NAME = 'myfxbook';
 
     const TYPE_MONTH_GROWTH = 'month-growth';
@@ -52,8 +52,8 @@ class MyFXBookClient {
 
     public function initAdminMenu() {
         add_options_page(
-            __('My FX Book Settings'),
-            'MyFXBookClient',
+            __('MyFXBook Client Settings'),
+            'MyFXBook Client',
             8,
             self::OPTIONS_PAGE,
             $this->getCallback('renderOptionsPage')
@@ -291,14 +291,17 @@ class MyFXBookClient {
         $login = isset($login) ? $login : (isset($options['login_field']) ? $options['login_field'] : null);
         $password = isset($password) ? $password : (isset($options['password_field']) ? $options['password_field'] : null);
         if (!isset(self::$session) && isset($login) && isset($password)) {
-            $result = $this->httpRequest('api/login.json', [
-                'email' => $login,
-                'password' => $password
-            ]);
-            if (!empty($result->session)) {
-                self::$session = $result->session;
+            if ($this->getEnvironment() == self::ENV_DEV) {
+                $result = $this->getDataFromJSON("myfxbook.login", true);
             } else {
-                self::$session = null;
+                $result = $this->httpRequest('api/login.json', [
+                    'email' => $login,
+                    'password' => $password
+                ]);
+            }
+
+            if (!$result->error) {
+                self::$session = $result->session;
             }
         }
         return self::$session;
@@ -307,7 +310,7 @@ class MyFXBookClient {
     private function getAccounts() {
         if (empty(self::$accounts)) {
             if ($this->getEnvironment() == self::ENV_DEV) {
-                $result = $this->getDataFromJSON('dev/getMyAccountsAPI');
+                $result = $this->getDataFromJSON("myfxbook.get-my-accounts", true);
             } else {
                 $result = $this->httpRequest('api/get-my-accounts.json', [
                     'session' => $this->getSession()
@@ -321,10 +324,11 @@ class MyFXBookClient {
         return self::$accounts;
     }
 
-    private function getDataFromJSON($file) {
-        $path = WDIP_ROOT . "/{$file}.json";
-        $content = file_get_contents($path);
-        return json_decode($content);
+    public function getDataFromJSON($file, $include_path = false) {
+        $path = $include_path ? "{$file}.json" : WDIP_ROOT . "/{$file}.json";
+        $content = file_get_contents($path, ($include_path ? FILE_USE_INCLUDE_PATH : null));
+
+        return $content ? json_decode($content) : "";
     }
 
     public function getVersion() {

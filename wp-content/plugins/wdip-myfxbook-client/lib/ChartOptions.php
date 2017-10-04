@@ -40,9 +40,13 @@ class ChartOptions extends MyFXBookData {
         $this->series = [];
         switch ($this->charttype) {
             case MFBClient::TYPE_MONTH_GROWTH:
+                foreach ($this->accountid as $id) {
+                    $this->addMonthGrowthSeries($id);
+                }
+                break;
             case MFBClient::TYPE_TOTAL_GROWTH:
                 foreach ($this->accountid as $id) {
-                    $this->addGrowthSeries($id);
+                    $this->addTotalGrowthSeries($id);
                 }
                 break;
             case MFBClient::TYPE_MONTHLY_GAIN_LOSS:
@@ -78,7 +82,64 @@ class ChartOptions extends MyFXBookData {
         ];
     }
 
-    private function addGrowthSeries($account_id) {
+    private function addMonthGrowthSeries($account_id) {
+        if ($account_info = MFBClient::instance()->getAccountInfo($account_id)) {
+            if (MFBClient::instance()->getEnvironment() == MFBClient::ENV_DEV) {
+                $result = MFBClient::instance()->getDataFromJSON("myfxbook.get-daily-gain-{$account_id}", true);
+            } else {
+                $daily_gain = MFBConfig::instance()->SERIES->daily_gain;
+                $result = MFBClient::instance()->httpRequest($daily_gain->url, [
+                    'session' => MFBClient::instance()->getSession(),
+                    'id' => $account_id,
+                    'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
+                    'end' => (new \DateTime())->format('Y-m-d')
+                ]);
+            }
+
+            if (!$result->error) {
+                if (empty($this->series)) {
+                    $series = [[
+                        'name' => 'Quest',
+                        'data' => [],
+                        'color' => 'rgba(124, 181, 236, 0.7)',
+                        'negativeColor' => 'rgba(255, 79, 79, 0.7)'
+                    ]];
+
+                    $start_value = 0;
+                } else {
+                    $series = $this->series;
+                    $start_value = $series[0]['data'][count($series[0]['data']) - 1][1];
+                }
+
+                $group = '';
+                $dailyGainData = [];
+                foreach ($result->dailyGain as $data) {
+                    $date = \DateTime::createFromFormat("m/d/Y", $data[0]->date);
+
+                    if ($group != $date->format('Ym')) {
+                        $group = $date->format('Ym');
+                        $dailyGainData[$group] = [];
+                    }
+
+                    if ($group == $date->format('Ym')) {
+                        $dailyGainData[$group][intval($date->format('d'))] = [
+                            $date->getTimestamp() * 1000,
+                            $start_value + $data[0]->value
+                        ];
+                    }
+                }
+
+                foreach ($dailyGainData as $data) {
+                    $last_day = max(array_keys($data));
+                    $series[0]['data'][] = $data[$last_day];
+                }
+
+                $this->series = $series;
+            }
+        }
+    }
+
+    private function addTotalGrowthSeries($account_id) {
         if ($account_info = MFBClient::instance()->getAccountInfo($account_id)) {
             $daily_gain = MFBConfig::instance()->SERIES->daily_gain;
             $result = MFBClient::instance()->httpRequest($daily_gain->url, [
@@ -147,7 +208,7 @@ class ChartOptions extends MyFXBookData {
                 $series = $this->series;
                 $start_value = $series[0]['data'][count($series[0]['data']) - 1][1];
             }
-            
+
             $countYear = \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y');
             $endYear = (new \DateTime())->format('Y');
             $endDate = (new \DateTime())->modify('last day of this month')->format('Y-m-d');

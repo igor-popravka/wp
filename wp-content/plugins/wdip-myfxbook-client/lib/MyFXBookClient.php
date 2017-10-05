@@ -11,7 +11,7 @@ class MyFXBookClient {
     const OPTIONS_GROUP = 'wdip-myfxbook-client-group';
     const OPTIONS_PAGE = 'wdip-myfxbook-clien-page';
     const OPTIONS_NAME = 'wdip-myfxbook-clien-options';
-    const SHORT_CODE_NAME = 'myfxbook';
+    const SHORT_CODE_NAME = 'myfxbook-clien';
 
     const TYPE_MONTH_GROWTH = 'month-growth';
     const TYPE_TOTAL_GROWTH = 'total-growth';

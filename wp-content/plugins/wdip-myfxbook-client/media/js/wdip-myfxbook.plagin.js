@@ -1,14 +1,16 @@
 (function ($) {
     var plugin = {
         init: function (options) {
-            Highcharts.chart($(this).attr('id'), plugin.getChartOptions(options));
+            options = plugin.getChartOptions(options);
+            Highcharts.chart($(this).attr('id'), options);
         },
 
         getChartOptions: function (options) {
             switch (options.charttype) {
                 case 'month-growth':
-                case 'monthly-gain-loss':
                     return plugin.getMonthGrowthOptions(options);
+                case 'monthly-gain-loss':
+                    return plugin.getMonthlyGainLossOptions(options);
                 case 'total-growth':
                     return plugin.getTotalGrowthOptions(options);
             }
@@ -68,6 +70,64 @@
                     valueSuffix: '%'
                 },
                 series: options.series
+            };
+        },
+
+        getMonthlyGainLossOptions: function (options) {
+            return {
+                credits: {
+                    enabled: false
+                },
+                chart: {
+                    backgroundColor: options.backgroundcolor || null,
+                    type: 'column',
+                    zoomType: 'x',
+                    height: options.chartheight || null,
+                    width: options.chartwidth || null,
+                    spacingBottom: 25
+                },
+                title: {
+                    text: options.title || ''
+                },
+                subtitle: {
+                    text: '',
+                    useHTML: true,
+                    align: "right"
+                },
+                xAxis: {
+                    gridLineWidth: 1,
+                    gridLineColor: options.gridlinecolor || '#7A7F87',
+                    gridLineDashStyle: 'dot',
+                    categories: options.categories || null
+                },
+                yAxis: {
+                    gridLineColor: options.gridlinecolor || '#7A7F87',
+                    title: {text: ''},
+                    labels: {
+                        formatter: function () {
+                            return this.value + '%';
+                        }
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    column: {
+                        shadow: true,
+                        borderRadius: 3,
+                        borderWidth: 1
+                    }
+                },
+                tooltip: {
+                    valueSuffix: '%'
+                },
+                series: [{
+                    name: 'Quest',
+                    data: options.seriesData,
+                    color: 'rgba(124, 181, 236, 0.7)',
+                    negativeColor: 'rgba(255, 79, 79, 0.7)'
+                }]
             };
         },
 

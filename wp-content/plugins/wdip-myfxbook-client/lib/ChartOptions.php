@@ -15,9 +15,11 @@ use WDIP\Plugin\MyFXBookConfig as MFBConfig;
  * @property $gridlinecolor
  * @property $monthtickinterval
  * @property $series
+ * @property $seriesData
  * @property MyFXBookData $CalcFormOptions
  * @property $fee
  * @property $adminUrl
+ * @property $categories
  */
 class ChartOptions extends MyFXBookData {
     private static $count = 0;
@@ -51,7 +53,9 @@ class ChartOptions extends MyFXBookData {
                 break;
             case MFBClient::TYPE_MONTHLY_GAIN_LOSS:
                 foreach ($this->accountid as $id) {
-                    $this->addMonthlyGainLossSeries($id);
+                    $xy_data = $this->addMonthlyGainLossSeries($id);
+                    $this->categories = array_keys($xy_data);
+                    $this->seriesData = array_values($xy_data);
                 }
                 break;
             case MFBClient::TYPE_CALCULATOR_FORM:
@@ -152,12 +156,7 @@ class ChartOptions extends MyFXBookData {
             if (!$result->error) {
                 $dailyGainData = [];
                 foreach ($result->dailyGain as $data) {
-                    if ($this->charttype == MFBClient::TYPE_MONTH_GROWTH) {
-                        $date = preg_replace("/(\d{2})\/\d{2}\/(\d{4})/", '$1/01/$2', $data[0]->date);
-                        $utc = \DateTime::createFromFormat("m/01/Y", $date)->getTimestamp() * 1000;
-                    } else {
-                        $utc = \DateTime::createFromFormat("m/d/Y", $data[0]->date)->getTimestamp() * 1000;
-                    }
+                    $utc = \DateTime::createFromFormat("m/d/Y", $data[0]->date)->getTimestamp() * 1000;
 
                     if (!isset($dailyGainData["uts_{$utc}"])) {
                         $dailyGainData["uts_{$utc}"] = ['uts' => $utc, 'value' => []];
@@ -192,54 +191,33 @@ class ChartOptions extends MyFXBookData {
     }
 
     private function addMonthlyGainLossSeries($account_id) {
+        static $xy_data = [];
+
         if ($account_info = MFBClient::instance()->getAccountInfo($account_id)) {
             $monthly_gain_los = MFBConfig::instance()->SERIES->monthly_gain_los;
+            $startYear = intval(\DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y'));
+            $endYear = intval((new \DateTime())->format('Y'));
 
-            if (empty($this->series)) {
-                $series = [[
-                    'name' => 'Quest',
-                    'data' => [],
-                    'color' => 'rgba(124, 181, 236, 0.7)',
-                    'negativeColor' => 'rgba(255, 79, 79, 0.7)'
-                ]];
-
-                $start_value = 0;
-            } else {
-                $series = $this->series;
-                $start_value = $series[0]['data'][count($series[0]['data']) - 1][1];
-            }
-
-            $countYear = \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y');
-            $endYear = (new \DateTime())->format('Y');
-            $endDate = (new \DateTime())->modify('last day of this month')->format('Y-m-d');
-            while ($countYear <= $endYear) {
+            while ($startYear <= $endYear) {
                 $result = MFBClient::instance()->httpRequest($monthly_gain_los->url, [
                     'chartType' => 3,
                     'monthType' => 0,
                     'accountOid' => $account_id,
-                    'startDate' => "{$countYear}-01-01",
-                    'endDate' => $endDate
+                    'startDate' => "{$startYear}-01-01",
+                    'endDate' => (new \DateTime())->format('Y-m-d')
                 ]);
                 if (isset($result->categories) && isset($result->series)) {
-                    $keys = array_map(function ($val) {
-                        $val = sprintf('01-%s', str_replace(' ', '-', $val));
-                        return \DateTime::createFromFormat('d-M-Y', $val)->getTimestamp() * 1000;
-                    }, $result->categories);
-                    $values = array_map(function ($item) {
-                        return array_shift($item);
-                    }, $result->series[0]->data);
-
-                    for ($i = 0; $i < count($keys); $i++) {
-                        $series[0]['data'][] = [
-                            $keys[$i] * 1,
-                            $start_value + $values[$i]
-                        ];
+                    foreach ($result->categories as $index => $name) {
+                        if (isset($xy_data[$name])) {
+                            $xy_data[$name] = $xy_data[$name] + array_shift($result->series[0]->data[$index]);
+                            continue;
+                        }
+                        $xy_data[$name] = array_shift($result->series[0]->data[$index]);
                     }
                 }
-                $countYear++;
+                $startYear++;
             }
-
-            $this->series = $series;
         }
+        return $xy_data;
     }
 }

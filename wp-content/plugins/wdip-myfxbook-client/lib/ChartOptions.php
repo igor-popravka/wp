@@ -145,13 +145,17 @@ class ChartOptions extends MyFXBookData {
 
     private function addTotalGrowthSeries($account_id) {
         if ($account_info = MFBClient::instance()->getAccountInfo($account_id)) {
-            $daily_gain = MFBConfig::instance()->SERIES->daily_gain;
-            $result = MFBClient::instance()->httpRequest($daily_gain->url, [
-                'session' => MFBClient::instance()->getSession(),
-                'id' => $account_id,
-                'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
-                'end' => (new \DateTime())->format('Y-m-d')
-            ]);
+            if (MFBClient::instance()->getEnvironment() == MFBClient::ENV_DEV) {
+                $result = MFBClient::instance()->getDataFromJSON("myfxbook.get-daily-gain-{$account_id}", true);
+            } else {
+                $daily_gain = MFBConfig::instance()->SERIES->daily_gain;
+                $result = MFBClient::instance()->httpRequest($daily_gain->url, [
+                    'session' => MFBClient::instance()->getSession(),
+                    'id' => $account_id,
+                    'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
+                    'end' => (new \DateTime())->format('Y-m-d')
+                ]);
+            }
 
             if (!$result->error) {
                 $dailyGainData = [];

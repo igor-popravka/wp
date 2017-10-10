@@ -44,20 +44,22 @@
 
                     var role = $(this).attr('role'),
                         from = false,
-                        to = max,
+                        date = new Date(max),
                         dataRange = [];
 
                     switch (role) {
                         case 'last-6-months':
-                            from = to - (6 * options.monthtickinterval);
+                            date.setMonth(date.getMonth() - 5);
+                            from = Date.UTC(date.getFullYear(), date.getMonth(), date.getDay());
                             break;
                         case 'last-12-months':
-                            from = to - (12 * options.monthtickinterval);
+                            date.setMonth(date.getMonth() - 11);
+                            from = Date.UTC(date.getFullYear(), date.getMonth(), date.getDay());
                     }
 
                     $(cart_data).each(function (i, row) {
                         if (from !== false) {
-                            if (row[0] >= from && row[0] <= to) {
+                            if (row[0] > from) {
                                 dataRange.push(row);
                             }
                         } else {
@@ -108,9 +110,8 @@
         getChartOptions: function (options) {
             switch (options.charttype) {
                 case 'month-growth':
-                    return plugin.getMonthGrowthOptions(options);
                 case 'monthly-gain-loss':
-                    return plugin.getMonthlyGainLossOptions(options);
+                    return plugin.getMonthGrowthOptions(options);
                 case 'total-growth':
                     return plugin.getTotalGrowthOptions(options);
             }
@@ -170,64 +171,6 @@
                     valueSuffix: '%'
                 },
                 series: options.series
-            };
-        },
-
-        getMonthlyGainLossOptions: function (options) {
-            return {
-                credits: {
-                    enabled: false
-                },
-                chart: {
-                    backgroundColor: options.backgroundcolor || null,
-                    type: 'column',
-                    zoomType: 'x',
-                    height: options.chartheight || null,
-                    width: options.chartwidth || null,
-                    spacingBottom: 25
-                },
-                title: {
-                    text: options.title || ''
-                },
-                subtitle: {
-                    text: '',
-                    useHTML: true,
-                    align: "right"
-                },
-                xAxis: {
-                    gridLineWidth: 1,
-                    gridLineColor: options.gridlinecolor || '#7A7F87',
-                    gridLineDashStyle: 'dot',
-                    categories: options.categories || null
-                },
-                yAxis: {
-                    gridLineColor: options.gridlinecolor || '#7A7F87',
-                    title: {text: ''},
-                    labels: {
-                        formatter: function () {
-                            return this.value + '%';
-                        }
-                    }
-                },
-                legend: {
-                    enabled: false
-                },
-                plotOptions: {
-                    column: {
-                        shadow: true,
-                        borderRadius: 3,
-                        borderWidth: 1
-                    }
-                },
-                tooltip: {
-                    valueSuffix: '%'
-                },
-                series: [{
-                    name: 'Quest',
-                    data: options.seriesData,
-                    color: 'rgba(124, 181, 236, 0.7)',
-                    negativeColor: 'rgba(255, 79, 79, 0.7)'
-                }]
             };
         },
 

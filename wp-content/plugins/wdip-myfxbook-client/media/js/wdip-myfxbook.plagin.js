@@ -1,7 +1,108 @@
 (function ($) {
     var plugin = {
         init: function (options) {
-            Highcharts.chart($(this).attr('id'), plugin.getChartOptions(options));
+            var chart_options = plugin.getChartOptions(options),
+                context = $(this),
+                min = max = null,
+                cart_data = chart_options.series[0].data,
+                chart = Highcharts.chart(context.attr('id'), chart_options);
+
+            $(cart_data).each(function (i, row) {
+                min = min || row[0];
+                max = max || row[0];
+
+                min = Math.min(min, row[0]);
+                max = Math.max(max, row[0]);
+            });
+
+            plugin.renderControlLabel(min, max, context, chart);
+
+            $(".slider-control", context).slider({
+                range: true,
+                min: min,
+                max: max,
+                values: [min, max],
+                slide: function (event, ui) {
+                    plugin.renderControlLabel(ui.values[0], ui.values[1], context);
+
+                    var dataRange = [];
+                    $(cart_data).each(function (i, row) {
+                        if (row[0] >= ui.values[0] && row[0] <= ui.values[1]) {
+                            dataRange.push(row);
+                        }
+                    });
+
+                    chart.series[0].setData(dataRange);
+                }
+            });
+
+            $(".button-months", context).each(function () {
+                $(this).click(function () {
+                    $(".button-months", context).each(function () {
+                        $(this).css("background-color", "rgba(68, 149, 204, 0.85)");
+                    });
+
+                    var role = $(this).attr('role'),
+                        from = false,
+                        to = max,
+                        dataRange = [];
+
+                    switch (role) {
+                        case 'last-6-months':
+                            from = to - (6 * options.monthtickinterval);
+                            break;
+                        case 'last-12-months':
+                            from = to - (12 * options.monthtickinterval);
+                    }
+
+                    $(cart_data).each(function (i, row) {
+                        if (from !== false) {
+                            if (row[0] >= from && row[0] <= to) {
+                                dataRange.push(row);
+                            }
+                        } else {
+                            dataRange.push(row);
+                        }
+                    });
+
+                    chart.series[0].setData(dataRange);
+
+                    $(this).css("background-color", "rgba(68, 149, 204, 1)");
+                });
+            })
+        },
+
+        renderControlLabel: function (min, max, context, chart) {
+            if ($('.label-control', context).length) {
+                var minDate = new Date(min),
+                    maxDate = new Date(max),
+                    locale = "en-us",
+                    minMonth = minDate.toLocaleDateString(locale, {month: 'short', year: '2-digit', day: 'numeric'}),
+                    maxMonth = maxDate.toLocaleDateString(locale, {month: 'short', year: '2-digit', day: 'numeric'});
+
+                $('.label-control.left', context).text(minMonth);
+                $('.label-control.right', context).text(maxMonth);
+
+                if (typeof chart != 'undefined') {
+                    chart.redraw();
+                }
+            }
+        },
+
+        buttonHTMLOwner: function () {
+            return '<div class="chart-button-control">\
+                    <button class="button-months" role="last-6-months" >Last 6 months</button>\
+                    <button class="button-months" role="last-12-months" >Last 12 months</button>\
+                    <button class="button-months" role="all-months">All months</button>\
+                </div>';
+        },
+
+        sliderHTMLOwner: function () {
+            return '<div class="chart-range-control">\
+                    <div class="label-control left"></div>\
+                    <div class="slider-control"></div>\
+                    <div class="label-control right"></div>\
+                </div>';
         },
 
         getChartOptions: function (options) {
@@ -32,7 +133,7 @@
                     text: options.title || ''
                 },
                 subtitle: {
-                    text: '',
+                    text: plugin.buttonHTMLOwner(),
                     useHTML: true,
                     align: "right"
                 },
@@ -91,7 +192,7 @@
                     text: options.title || ''
                 },
                 subtitle: {
-                    text: '',
+                    text: plugin.sliderHTMLOwner(),
                     useHTML: true,
                     align: "center"
                 },

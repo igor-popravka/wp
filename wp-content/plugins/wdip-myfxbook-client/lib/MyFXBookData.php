@@ -10,10 +10,18 @@ namespace WDIP\Plugin;
 
 
 class MyFXBookData extends \ArrayObject {
+    private static $count = 0;
+
     public function __construct($data = []) {
         if (!empty($data)){
             $this->__init($data);
         }
+        $this->generateUID();
+    }
+
+    private function generateUID() {
+        $uid_string = sprintf("%s-%s-%d-%d", static::class, $this->charttype, time(), self::$count++);
+        $this->uid = md5($uid_string);
     }
 
     public function has($name) {

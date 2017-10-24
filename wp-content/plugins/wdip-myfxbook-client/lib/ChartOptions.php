@@ -22,20 +22,12 @@ use WDIP\Plugin\MyFXBookConfig as MFBConfig;
  * @property $categories
  */
 class ChartOptions extends MyFXBookData {
-    private static $count = 0;
-
     public function __construct(MyFXBookData $options) {
         parent::__construct($options);
 
         $this->monthtickinterval = 1000 * 3600 * 24 * 30;
 
-        $this->generateUID();
         $this->generateSeries();
-    }
-
-    private function generateUID() {
-        $uid_string = sprintf("%s-%s-%d-%d", __CLASS__, $this->charttype, time(), self::$count++);
-        $this->uid = md5($uid_string);
     }
 
     private function generateSeries() {

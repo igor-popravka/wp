@@ -17,6 +17,7 @@ class MyFXBookClient {
     const TYPE_TOTAL_GROWTH = 'total-growth';
     const TYPE_MONTHLY_GAIN_LOSS = 'monthly-gain-loss';
     const TYPE_CALCULATOR_FORM = 'calculator-form';
+    const TYPE_MONTH_GROWTH_TABLE = 'month-growth-table';
 
     const ENV_DEV = 'dev';
     const ENV_LIVE = 'live';
@@ -74,6 +75,11 @@ class MyFXBookClient {
                 case self::TYPE_CALCULATOR_FORM:
                     $options = new ChartOptions($attributes);
                     $content .= Viewer::instance()->render('calculator-form', $options);
+                    break;
+                case self::TYPE_MONTH_GROWTH_TABLE:
+                    $options = new ChartOptions($attributes);
+                    $content .= Viewer::instance()->render('quest-monthly-table', $options);
+                    break;
             }
         }
 

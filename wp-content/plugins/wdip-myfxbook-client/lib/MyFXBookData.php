@@ -30,7 +30,7 @@ class MyFXBookData extends \ArrayObject {
     }
 
     private function generateUID() {
-        $uid_string = sprintf("%s-%s-%d-%d", static::class, $this->charttype, time(), self::$count++);
+        $uid_string = sprintf("%s-%s-%d-%d", get_called_class(), $this->charttype, time(), self::$count++);
         $this->uid = md5($uid_string);
     }
 

@@ -25,23 +25,23 @@ $options = $this->getOptions();
     <?php foreach ($options->tableData['BODY'] as $row): ?>
         <tr>
             <td><?php echo $row['YEAR']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['JAN'] . "%" : $row['MONTHS']['JAN']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['FEB'] . "%" : $row['MONTHS']['FEB']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['MAR'] . "%" : $row['MONTHS']['MAR']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['APR'] . "%" : $row['MONTHS']['APR']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['MAY'] . "%" : $row['MONTHS']['MAY']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['JUN'] . "%" : $row['MONTHS']['JUN']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['JUL'] . "%" : $row['MONTHS']['JUL']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['AUG'] . "%" : $row['MONTHS']['AUG']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['SEP'] . "%" : $row['MONTHS']['SEP']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['OCT'] . "%" : $row['MONTHS']['OCT']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['NOV'] . "%" : $row['MONTHS']['NOV']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['DEC'] . "%" : $row['MONTHS']['DEC']; ?></td>
-            <td><?php echo $row['TOT'] != 'N/A' ? $row['TOT'] . "%" : $row['TOT']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN']; ?></td>
+            <td><?php echo $row['MONTHS']['FEB']; ?></td>
+            <td><?php echo $row['MONTHS']['MAR']; ?></td>
+            <td><?php echo $row['MONTHS']['APR']; ?></td>
+            <td><?php echo $row['MONTHS']['MAY']; ?></td>
+            <td><?php echo $row['MONTHS']['JUN']; ?></td>
+            <td><?php echo $row['MONTHS']['JUL']; ?></td>
+            <td><?php echo $row['MONTHS']['AUG']; ?></td>
+            <td><?php echo $row['MONTHS']['SEP']; ?></td>
+            <td><?php echo $row['MONTHS']['OCT']; ?></td>
+            <td><?php echo $row['MONTHS']['NOV']; ?></td>
+            <td><?php echo $row['MONTHS']['DEC']; ?></td>
+            <td><?php echo $row['TOT']; ?></td>
         </tr>
     <?php endforeach; ?>
     <tr>
-        <td colspan="13" style="padding-left: 1.5%; font-weight: bold; text-align:left;">TOTAL COMPOUNDED RETURN</td>
-        <td style="font-weight: bold; text-align:left;"><?php echo $options->tableData['TOTAL_COMPOUNDED']; ?>%</td>
+        <td colspan="13"><b>TOTAL COMPOUNDED RETURN</b></td>
+        <td><b><?php echo $options->tableData['TOTAL_COMPOUNDED']; ?>%</b></td>
     </tr>
 </table>

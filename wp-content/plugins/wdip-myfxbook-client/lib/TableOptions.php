@@ -55,13 +55,22 @@ class TableOptions extends MyFXBookData {
         };
 
         $total_compounded = 0;
-        foreach ($body as $row) {
+        foreach ($body as &$row) {
             $total_compounded += $row['TOT'];
+            foreach ($row['MONTHS'] as &$v) {
+                if ($v === 0) {
+                    $v = '0.00%';
+                } else if ($v !== 'N/A') {
+                    $v = number_format($v, 2) . "%";
+                }
+            }
+
+            $row['TOT'] = number_format($row['TOT'], 2) . "%";
         }
 
         $this->tableData = [
             'BODY' => $body,
-            'TOTAL_COMPOUNDED' => $total_compounded
+            'TOTAL_COMPOUNDED' => number_format($total_compounded, 2)
         ];
     }
 }

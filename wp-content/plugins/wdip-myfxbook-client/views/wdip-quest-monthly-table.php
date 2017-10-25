@@ -1,9 +1,8 @@
 <?php
-/**
- * @author: igor.popravka
- * Date: 24.10.2017
- * Time: 11:28
- */
+/** @var \WDIP\Plugin\Viewer $this */
+/** @var \WDIP\Plugin\TableOptions $options */
+
+$options = $this->getOptions();
 ?>
 
 <table class="chart">
@@ -17,142 +16,32 @@
         <th>JUN</th>
         <th>JUL</th>
         <th>AUG</th>
-        <th>SEPT</th>
+        <th>SEP</th>
         <th>OCT</th>
         <th>NOV</th>
         <th>DEC</th>
         <th>TOT</th>
     </tr>
-    <tr>
-        <td>2010</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>N/A</td>
-        <td>-7.58%</td>
-        <td>21.19%</td>
-        <td>13.61%</td>
-    </tr>
-    <tr>
-        <td>2011</td>
-        <td>-2.22%</td>
-        <td>-7.35%</td>
-        <td>28.09%</td>
-        <td>2.74%</td>
-        <td>-1.68%</td>
-        <td>1.27%</td>
-        <td>11.80%</td>
-        <td>4.33%</td>
-        <td>15.64%</td>
-        <td>-16.44%</td>
-        <td>-1.47%</td>
-        <td>0.76%</td>
-        <td>35.47%</td>
-    </tr>
-    <tr>
-        <td>2012</td>
-        <td>9.70%</td>
-        <td>0.57%</td>
-        <td>-12.83%</td>
-        <td>0.08%</td>
-        <td>22.81%</td>
-        <td>-4.33%</td>
-        <td>5.99%</td>
-        <td>-13.55%</td>
-        <td>11.10%</td>
-        <td>-6.38%</td>
-        <td>-0.68%</td>
-        <td>27.06%</td>
-        <td>39.54%</td>
-    </tr>
-    <tr>
-        <td>2013</td>
-        <td>9.86%</td>
-        <td>10.97%</td>
-        <td>-6.39%</td>
-        <td>-2.42%</td>
-        <td>4.28%</td>
-        <td>13.08%</td>
-        <td>0.87%</td>
-        <td>-3.27%</td>
-        <td>10.41%</td>
-        <td>1.00%</td>
-        <td>10.55%</td>
-        <td>15.45%</td>
-        <td>64.39%</td>
-    </tr>
-    <tr>
-        <td>2014</td>
-        <td>-2.70%</td>
-        <td>-2.30%</td>
-        <td>2.98%</td>
-        <td>-0.65%</td>
-        <td>-6.06%</td>
-        <td>3.29%</td>
-        <td>-2.70%</td>
-        <td>-0.87%</td>
-        <td>22.74%</td>
-        <td>-1.83%</td>
-        <td>-0.42%</td>
-        <td>4.76%</td>
-        <td>16.24%</td>
-    </tr>
-    <tr>
-        <td>2015</td>
-        <td>13.19%</td>
-        <td>-15.10%</td>
-        <td>7.46%</td>
-        <td>-1.51%</td>
-        <td>2.50%</td>
-        <td>-3.17%</td>
-        <td>5.95%</td>
-        <td>10.57%</td>
-        <td>0.11%</td>
-        <td>-5.89%</td>
-        <td>2.38%</td>
-        <td>5.56%</td>
-        <td>22.05%</td>
-    </tr>
-    <tr>
-        <td>2016</td>
-        <td>9.32%</td>
-        <td>24.01%</td>
-        <td>-2.21%</td>
-        <td>1.17%</td>
-        <td>0.62%</td>
-        <td>14.10%</td>
-        <td>-1.08%</td>
-        <td>2.82%</td>
-        <td>0.23%</td>
-        <td>0.59%</td>
-        <td>-1.59%</td>
-        <td>1.55%</td>
-        <td>48.94%</td>
-    </tr>
-    <tr>
-        <td>2017</td>
-        <td>-1.36%</td>
-        <td>2.52-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>%</td>
-    </tr>
+    <?php foreach ($options->tableData['BODY'] as $row): ?>
+        <tr>
+            <td><?php echo $row['YEAR']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['JAN'] . "%" : $row['MONTHS']['JAN']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['FEB'] . "%" : $row['MONTHS']['FEB']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['MAR'] . "%" : $row['MONTHS']['MAR']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['APR'] . "%" : $row['MONTHS']['APR']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['MAY'] . "%" : $row['MONTHS']['MAY']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['JUN'] . "%" : $row['MONTHS']['JUN']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['JUL'] . "%" : $row['MONTHS']['JUL']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['AUG'] . "%" : $row['MONTHS']['AUG']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['SEP'] . "%" : $row['MONTHS']['SEP']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['OCT'] . "%" : $row['MONTHS']['OCT']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['NOV'] . "%" : $row['MONTHS']['NOV']; ?></td>
+            <td><?php echo $row['MONTHS']['JAN'] != 'N/A' ? $row['MONTHS']['DEC'] . "%" : $row['MONTHS']['DEC']; ?></td>
+            <td><?php echo $row['TOT'] != 'N/A' ? $row['TOT'] . "%" : $row['TOT']; ?></td>
+        </tr>
+    <?php endforeach; ?>
     <tr>
         <td colspan="13" style="padding-left: 1.5%; font-weight: bold; text-align:left;">TOTAL COMPOUNDED RETURN</td>
-        <td style="font-weight: bold; text-align:left;">617.59%</td>
+        <td style="font-weight: bold; text-align:left;"><?php echo $options->tableData['TOTAL_COMPOUNDED']; ?>%</td>
     </tr>
 </table>

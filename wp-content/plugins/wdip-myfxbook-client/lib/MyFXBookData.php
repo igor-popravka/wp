@@ -11,12 +11,22 @@ namespace WDIP\Plugin;
 
 class MyFXBookData extends \ArrayObject {
     private static $count = 0;
+    private $model;
 
     public function __construct($data = []) {
+        $this->model = new MyFXBookModel();
+        
         if (!empty($data)){
             $this->__init($data);
         }
         $this->generateUID();
+    }
+
+    /**
+     * @return MyFXBookModel
+     */
+    public function getModel(){
+        return $this->model;
     }
 
     private function generateUID() {

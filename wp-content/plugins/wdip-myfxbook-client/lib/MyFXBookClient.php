@@ -77,7 +77,7 @@ class MyFXBookClient {
                     $content .= Viewer::instance()->render('calculator-form', $options);
                     break;
                 case self::TYPE_MONTH_GROWTH_TABLE:
-                    $options = new ChartOptions($attributes);
+                    $options = new TableOptions($attributes);
                     $content .= Viewer::instance()->render('quest-monthly-table', $options);
                     break;
             }

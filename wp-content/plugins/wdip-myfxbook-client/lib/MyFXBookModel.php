@@ -54,8 +54,14 @@ class MyFXBookModel {
                 ]);
 
                 if (isset($result->categories) && isset($result->series)) {
-                    $data[]  = array_combine($result->categories, $result->series[0]->data);
+                    $series_data = array_map(function($v){
+                        return $v[0];
+                    }, $result->series[0]->data);
+
+                    $data[]  = [$result->categories, $series_data];
                 }
+
+                $startYear++;
             }
 
             RuntimeCache::instance()->setValue($key, $data);

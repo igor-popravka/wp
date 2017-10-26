@@ -33,7 +33,8 @@ class MyFXBookModel {
             if (!$result->error) {
                 $data = array_map(function ($dt) use ($basic) {
                     return [
-                        \DateTime::createFromFormat("m/d/Y", $dt[0]->date)->getTimestamp() * 1000,
+                        //\DateTime::createFromFormat("m/d/Y", $dt[0]->date)->getTimestamp(),
+                        $dt[0]->date,
                         $dt[0]->value + $basic
                     ];
                 }, $result->dailyGain);

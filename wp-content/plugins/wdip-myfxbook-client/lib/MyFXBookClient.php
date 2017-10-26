@@ -71,6 +71,9 @@ class MyFXBookClient {
                     $content .= Viewer::instance()->render('myfxbook-chart', $options);
                     break;
                 case self::TYPE_TOTAL_GROWTH:
+                    $options = new TotalGrowthOptions($attributes);
+                    $content .= Viewer::instance()->render('myfxbook-chart', $options);
+                    break;
                 case self::TYPE_MONTHLY_GAIN_LOSS:
                     $options = new ChartOptions($attributes);
                     $content .= Viewer::instance()->render('myfxbook-chart', $options);

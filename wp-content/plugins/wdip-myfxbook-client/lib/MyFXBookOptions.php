@@ -17,7 +17,7 @@ abstract class MyFXBookOptions extends MyFXBookData {
 
     abstract protected function generate();
 
-    public function __construct(array $data = []) {
+    public function __construct(MyFXBookData $data = null) {
         parent::__construct($data);
         $this->init();
     }
@@ -27,6 +27,8 @@ abstract class MyFXBookOptions extends MyFXBookData {
 
         $uid_string = sprintf("%s-%s-%d-%d", get_called_class(), $this->charttype, time(), self::$count++);
         $this->uid = md5($uid_string);
+        
+        $this->generate();
     }
 
     /**

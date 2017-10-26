@@ -42,6 +42,6 @@ $options = $this->getOptions();
     <?php endforeach; ?>
     <tr>
         <td colspan="13"><b style="float: left; margin-left: 18px">TOTAL COMPOUNDED RETURN</b></td>
-        <td><b><?php echo $options->tableData['TOTAL_COMPOUNDED']; ?>%</b></td>
+        <td><b><?php echo $options->tableData['TOTAL_COMPOUNDED']; ?></b></td>
     </tr>
 </table>

@@ -11,16 +11,18 @@ use WDIP\Plugin\MyFXBookConfig as MFBConfig;
  */
 class MyFXBookModel {
 
-    public function getTotalGrowthData($account_id) {
-        $key = md5("MYFXBOOK-TOTAL-GROWTH-DATA-{$account_id}");
+    public function getGrowthData($account_id, $basic = 0) {
+        $key = md5("MYFXBOOK-GROWTH-DATA-{$account_id}");
         $result = RuntimeCache::instance()->getValue($key);
 
         if (empty($result) && ($account_info = $this->getAccountInfo($account_id))) {
+            $data = [];
+
             if (MFBClient::instance()->getEnvironment() == MFBClient::ENV_DEV) {
                 $result = MFBClient::instance()->getDataFromJSON("myfxbook.get-daily-gain-{$account_id}", true);
             } else {
-                $daily_gain = MFBConfig::instance()->SERIES->daily_gain;
-                $result = MFBClient::instance()->httpRequest($daily_gain->url, [
+                $config = MFBConfig::instance()->MYFXBOOK_API->daily_gain;
+                $result = MFBClient::instance()->httpRequest($config->url, [
                     'session' => MFBClient::instance()->getSession(),
                     'id' => $account_id,
                     'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
@@ -28,13 +30,22 @@ class MyFXBookModel {
                 ]);
             }
 
-            RuntimeCache::instance()->setValue($key, $result);
+            if (!$result->error) {
+                $data = array_map(function ($dt) use ($basic) {
+                    return [
+                        \DateTime::createFromFormat("m/d/Y", $dt[0]->date)->getTimestamp() * 1000,
+                        $dt[0]->value + $basic
+                    ];
+                }, $result->dailyGain);
+            }
+
+            RuntimeCache::instance()->setValue($key, $data);
         }
 
         return RuntimeCache::instance()->getValue($key, []);
     }
 
-    public function getMonthlyGainLossData($account_id) {
+    public function getGainLossData($account_id) {
         $key = md5("MYFXBOOK-MONTHLY-GAIN-LOSS-DATA-{$account_id}");
         $result = RuntimeCache::instance()->getValue($key);
 
@@ -54,11 +65,11 @@ class MyFXBookModel {
                 ]);
 
                 if (isset($result->categories) && isset($result->series)) {
-                    $series_data = array_map(function($v){
+                    $series_data = array_map(function ($v) {
                         return $v[0];
                     }, $result->series[0]->data);
 
-                    $data[]  = [$result->categories, $series_data];
+                    $data[] = [$result->categories, $series_data];
                 }
 
                 $startYear++;
@@ -98,5 +109,29 @@ class MyFXBookModel {
         }
 
         throw new \Exception("Account {$account_id} didn't found in MyFxBook accounts.");
+    }
+
+    public function getTotalGainData($account_id) {
+        $key = md5("MYFXBOOK-TOTAL-GAIN-DATA-{$account_id}");
+        $result = RuntimeCache::instance()->getValue($key);
+
+        if (!isset($result) && $account_info = $this->getAccountInfo($account_id)) {
+            $value = null;
+            $config = MFBConfig::instance()->MYFXBOOK_API->gain;
+            $result = MFBClient::instance()->httpRequest($config->url, [
+                'session' => MFBClient::instance()->getSession(),
+                'id' => $account_id,
+                'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
+                'end' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->lastUpdateDate)->format('Y-m-d')
+            ]);
+
+            if (!$result->error) {
+                $value = $result->value;
+            }
+
+            RuntimeCache::instance()->setValue($key, $value);
+        }
+
+        return RuntimeCache::instance()->getValue($key, 0);
     }
 }

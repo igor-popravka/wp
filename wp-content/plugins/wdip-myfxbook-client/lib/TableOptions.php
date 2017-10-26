@@ -6,20 +6,15 @@ namespace WDIP\Plugin;
  * Date: 24.10.2017
  * Time: 13:18
  *
- * @property $uid
  * @property $tableData
- * @property $accountid
  */
-class TableOptions extends MyFXBookData {
-    public function __construct(MyFXBookData $options) {
-        parent::__construct($options);
-        $this->generateTableData();
-    }
-
-    private function generateTableData() {
+class TableOptions extends MyFXBookOptions {
+    protected function generate() {
         $data = [];
+        $total_compounded = 0;
         foreach ($this->accountid as $id) {
-            $data = array_merge($data, $this->getModel()->getMonthlyGainLossData($id));
+            $data = array_merge($data, $this->getModel()->getGainLossData($id));
+            $total_compounded += $this->getModel()->getTotalGainData($id);
         }
 
         $body = [];
@@ -54,23 +49,22 @@ class TableOptions extends MyFXBookData {
             }
         };
 
-        $total_compounded = 0;
-        foreach ($body as &$row) {
-            $total_compounded += $row['TOT'];
-            foreach ($row['MONTHS'] as &$v) {
-                if ($v === 0) {
-                    $v = '0.00%';
-                } else if ($v !== 'N/A') {
-                    $v = number_format($v, 2) . "%";
+        $body = array_map(function ($row){
+            $row['MONTHS'] = array_map(function ($val){
+                if ($val === 0) {
+                    return '0.00%';
+                } else if ($val !== 'N/A') {
+                    return number_format($val, 2) . "%";
                 }
-            }
+                return $val;
+            }, $row['MONTHS']);
 
             $row['TOT'] = number_format($row['TOT'], 2) . "%";
-        }
+        }, $body);
 
         $this->tableData = [
             'BODY' => $body,
-            'TOTAL_COMPOUNDED' => number_format($total_compounded, 2)
+            'TOTAL_COMPOUNDED' => number_format($total_compounded, 2) . "%"
         ];
     }
 }

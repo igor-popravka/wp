@@ -49,8 +49,8 @@ class TableOptions extends MyFXBookOptions {
             }
         };
 
-        $body = array_map(function ($row){
-            $row['MONTHS'] = array_map(function ($val){
+        foreach ($body as &$row) {
+            $row['MONTHS'] = array_map(function ($val) {
                 if ($val === 0) {
                     return '0.00%';
                 } else if ($val !== 'N/A') {
@@ -60,7 +60,7 @@ class TableOptions extends MyFXBookOptions {
             }, $row['MONTHS']);
 
             $row['TOT'] = number_format($row['TOT'], 2) . "%";
-        }, $body);
+        }
 
         $this->tableData = [
             'BODY' => $body,

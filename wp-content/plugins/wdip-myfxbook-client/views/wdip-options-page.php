@@ -6,7 +6,7 @@ use WDIP\Plugin\MyFXBookClient as MFBClient;
 <div class="wrap">
     <h1><?= esc_html(get_admin_page_title()); ?></h1>
     <p>
-    <div><span style="margin-right: 20px;">Author Name:</span><i>Igor P.</i></div>
+    <div><span style="margin-right: 20px;">Author Name:</span><i>Igor Popravka</i></div>
     <div>
         <span style="margin-right: 20px;">Author Page:</span>
         <i><a href="https://www.upwork.com/freelancers/~010854a54a1811f970">https://www.upwork.com/freelancers/~010854a54a1811f970</a></i>

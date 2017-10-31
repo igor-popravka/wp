@@ -25,7 +25,7 @@ class MonthGrowthOptions extends MyFXBookOptions {
                 $group_data[$group_name] = [0, 0];
             }
 
-            $uts = $date->getTimestamp() * 1000;
+            $uts = (($date->getTimestamp() * 1000) - $this->monthtickinterval);
             if ($group_data[$group_name][0] <= $uts) {
                 $group_data[$group_name][0] = $uts;
                 $group_data[$group_name][1] = $data[1];

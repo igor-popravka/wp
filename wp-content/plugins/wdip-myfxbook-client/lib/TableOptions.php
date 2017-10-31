@@ -24,10 +24,12 @@ class TableOptions extends MyFXBookOptions {
             $months = ['JAN' => 'N/A', 'FEB' => 'N/A', 'MAR' => 'N/A', 'APR' => 'N/A', 'MAY' => 'N/A', 'JUN' => 'N/A', 'JUL' => 'N/A', 'AUG' => 'N/A', 'SEP' => 'N/A', 'OCT' => 'N/A', 'NOV' => 'N/A', 'DEC' => 'N/A'];
             $total = 0;
             foreach ($combine_data as $date => $val) {
-                $year = \DateTime::createFromFormat('M Y', $date)->format('Y');
-                $month = strtoupper(\DateTime::createFromFormat('M Y', $date)->format('M'));
-                $months[$month] = $val;
-                $total += $val;
+                if (preg_match('/^([a-z]{3})\s(\d{4})$/i', $date, $match) > 0) {
+                    $year = $match[2];
+                    $month = strtoupper($match[1]);
+                    $months[$month] = $val;
+                    $total += $val;
+                }
             }
 
             if (isset($body[$year])) {

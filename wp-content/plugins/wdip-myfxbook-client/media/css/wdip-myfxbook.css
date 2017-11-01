@@ -92,3 +92,11 @@
     color: #6c645c;
     font-weight: bold;
 }
+
+td.table-tick-green{
+    color: green;
+}
+
+td.table-tick-red{
+    color: red;
+}

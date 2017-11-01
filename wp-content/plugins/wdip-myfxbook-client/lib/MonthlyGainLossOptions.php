@@ -10,31 +10,39 @@ namespace WDIP\Plugin;
 
 /**
  * @property $series
- * @property $monthtickinterval
+ * @property $categories
  */
 class MonthlyGainLossOptions extends MyFXBookOptions{
     protected function generate() {
-        $this->monthtickinterval = 1000 * 3600 * 24 * 30;
-
-        $data = [];
+        $raw_data = [];
         foreach ($this->accountid as $id) {
-            $data = array_merge($data, $this->getModel()->getGainLossData($id));
+            $raw_data = array_merge($raw_data, $this->getModel()->getGainLossData($id));
         }
 
-        $series_data = [];
-        foreach ($data as $dt) {
+        $group_data = [];
+        foreach ($raw_data as $dt) {
             $combine_data = array_combine($dt[0], $dt[1]);
             foreach ($combine_data as $date => $val) {
-                if (isset($series_data[$date])) {
-                    $series_data[$date][1] += $val;
+                if (isset($group_data[$date])) {
+                    $group_data[$date][1] += $val;
                 } else {
-                    $series_data[$date] = [
-                        ((\DateTime::createFromFormat('M Y', $date)->getTimestamp() * 1000) - $this->monthtickinterval),
+                    $group_data[$date] = [
+                        \DateTime::createFromFormat('M Y', $date)->format("M 'y"),
                         $val
                     ];
                 }
             }
         };
+
+        $categories = array_map(function ($val) {
+            return $val[0];
+        }, $group_data);
+
+        $this->categories = array_values($categories);
+
+        $series_data = array_map(function ($val) {
+            return $val[1];
+        }, $group_data);
 
         $this->series = [[
             'name' => 'Quest',

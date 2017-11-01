@@ -1,83 +1,101 @@
 (function ($) {
     var plugin = {
         init: function (options) {
-            var chart_options = plugin.getChartOptions(options),
-                context = $(this),
-                min = max = null,
-                cart_data = chart_options.series[0].data,
-                chart = Highcharts.chart(context.attr('id'), chart_options);
-
-            $(cart_data).each(function (i, row) {
-                min = min || row[0];
-                max = max || row[0];
-
-                min = Math.min(min, row[0]);
-                max = Math.max(max, row[0]);
-            });
-
-            plugin.renderControlLabel(min, max, context, chart);
-
-            $(".slider-control", context).slider({
-                range: true,
-                min: min,
-                max: max,
-                values: [min, max],
-                slide: function (event, ui) {
-                    plugin.renderControlLabel(ui.values[0], ui.values[1], context);
-
-                    var dataRange = [];
-                    $(cart_data).each(function (i, row) {
-                        if (row[0] >= ui.values[0] && row[0] <= ui.values[1]) {
-                            dataRange.push(row);
-                        }
-                    });
-
-                    chart.series[0].setData(dataRange);
-                }
-            });
-
-            $(".button-months", context).each(function () {
-                $(this).click(function () {
-                    $(".button-months", context).each(function () {
-                        $(this).css("background-color", "rgba(68, 149, 204, 0.85)");
-                    });
-
-                    var role = $(this).attr('role'),
-                        from = false,
-                        date = new Date(max),
-                        dataRange = [];
-
-                    switch (role) {
-                        case 'last-6-months':
-                            date.setMonth(date.getMonth() - 5);
-                            from = Date.UTC(date.getFullYear(), date.getMonth(), date.getDay());
-                            break;
-                        case 'last-12-months':
-                            date.setMonth(date.getMonth() - 11);
-                            from = Date.UTC(date.getFullYear(), date.getMonth(), date.getDay());
-                    }
-
-                    $(cart_data).each(function (i, row) {
-                        if (from !== false) {
-                            if (row[0] > from) {
-                                dataRange.push(row);
-                            }
-                        } else {
-                            dataRange.push(row);
-                        }
-                    });
-
-                    chart.series[0].setData(dataRange);
-
-                    $(this).css("background-color", "rgba(68, 149, 204, 1)");
-                });
-            })
+            switch (options.charttype) {
+                case 'month-growth':
+                case 'monthly-gain-loss':
+                    $.proxy(plugin.initColumnsChart, this, options)();
+                    break;
+                case 'total-growth':
+                    $.proxy(plugin.initLineChart, this, options)();
+            }
         },
 
-        renderControlLabel: function (min, max, context, chart) {
+        initColumnsChart: function (options) {
+            var chartOptions = plugin.getMonthGrowthOptions(options),
+                chart = Highcharts.chart($(this).attr('id'), chartOptions);
+
+            $(this).prop('seriesData', options.series[0].data);
+            $(this).prop('xAxisCategories', options.categories);
+
+            $(".button-months.time-tick-6", $(this)).click($.proxy(plugin.applyButtonFilter, $(this), chart, 6));
+            $(".button-months.time-tick-12", $(this)).click($.proxy(plugin.applyButtonFilter, $(this), chart, 12));
+            $(".button-months.time-tick-all", $(this)).click($.proxy(plugin.applyButtonFilter, $(this), chart, 'all'));
+        },
+
+        initLineChart: function (options) {
+            var chartOptions = plugin.getTotalGrowthOptions(options),
+                chart = Highcharts.chart($(this).attr('id'), chartOptions);
+
+            $(this).prop('seriesData', options.series[0].data);
+
+            $.proxy(plugin.renderControlLabel, $(this), chart)();
+            $(".slider-control", $(this)).slider($.proxy(plugin.getSliderFilterOptions, $(this), chart)());
+        },
+
+        applyButtonFilter: function (chart, interval) {
+            $(".button-months", this).each(function () {
+                $(this).css("background-color", "rgba(68, 149, 204, 0.85)");
+            });
+
+            var seriesData = $(this).prop('seriesData'),
+                xAxisCategories = $(this).prop('xAxisCategories'),
+                rangeData = [],
+                rangeCategories = [],
+                count = 1;
+
+            if (interval !== 'all') {
+                do {
+                    rangeData.unshift(seriesData[seriesData.length - count]);
+                    rangeCategories.unshift(xAxisCategories[xAxisCategories.length - count]);
+                    count++;
+                } while (count <= interval);
+            } else {
+                rangeData = seriesData;
+                rangeCategories = xAxisCategories;
+            }
+
+            chart.series[0].setData(rangeData);
+            chart.xAxis[0].setCategories(rangeCategories);
+
+            $(".button-months.time-tick-" + interval, this).css("background-color", "rgba(68, 149, 204, 1)");
+        },
+
+        getSliderFilterOptions: function (chart) {
+            var context = $(this),
+                seriesData = context.prop('seriesData'),
+                minTimeTick = seriesData[0][0],
+                maxTimeTick = seriesData[seriesData.length - 1][0];
+
+            return {
+                range: true,
+                min: minTimeTick,
+                max: maxTimeTick,
+                values: [minTimeTick, maxTimeTick],
+                slide: function (event, ui) {
+                    $.proxy(plugin.renderControlLabel, context, chart, ui.values[0], ui.values[1])();
+
+                    var rangeData = [];
+                    $(seriesData).each(function (i, row) {
+                        if (row[0] >= ui.values[0] && row[0] <= ui.values[1]) {
+                            rangeData.push(row);
+                        }
+                    });
+
+                    chart.series[0].setData(rangeData);
+                }
+            }
+        },
+
+        renderControlLabel: function (chart, minTimeTick, maxTimeTick) {
+            var context = $(this),
+                seriesData = context.prop('seriesData'),
+                minTimeTick = minTimeTick || seriesData[0][0],
+                maxTimeTick = maxTimeTick || seriesData[seriesData.length - 1][0];
+
             if ($('.label-control', context).length) {
-                var minDate = new Date(min),
-                    maxDate = new Date(max),
+                var minDate = new Date(minTimeTick),
+                    maxDate = new Date(maxTimeTick),
                     locale = "en-us",
                     minMonth = minDate.toLocaleDateString(locale, {month: 'short', year: '2-digit', day: 'numeric'}),
                     maxMonth = maxDate.toLocaleDateString(locale, {month: 'short', year: '2-digit', day: 'numeric'});
@@ -93,9 +111,9 @@
 
         buttonHTMLOwner: function () {
             return '<div class="chart-button-control">\
-                    <button class="button-months" role="last-6-months" >Last 6 months</button>\
-                    <button class="button-months" role="last-12-months" >Last 12 months</button>\
-                    <button class="button-months" role="all-months">All months</button>\
+                    <button class="button-months time-tick-6">Last 6 months</button>\
+                    <button class="button-months time-tick-12">Last 12 months</button>\
+                    <button class="button-months time-tick-all">All months</button>\
                 </div>';
         },
 
@@ -144,9 +162,7 @@
                     gridLineWidth: 1,
                     gridLineColor: options.gridlinecolor || '#7A7F87',
                     gridLineDashStyle: 'dot',
-                    type: 'datetime',
-                    tickInterval: options.monthtickinterval,
-                    crosshair: true
+                    categories: options.categories
                 },
                 yAxis: {
                     gridLineColor: options.gridlinecolor || '#7A7F87',

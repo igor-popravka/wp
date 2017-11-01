@@ -24,24 +24,24 @@ $options = $this->getOptions();
     </tr>
     <?php foreach ($options->tableData['BODY'] as $row): ?>
         <tr>
-            <td><?php echo $row['YEAR']; ?></td>
-            <td><?php echo $row['MONTHS']['JAN']; ?></td>
-            <td><?php echo $row['MONTHS']['FEB']; ?></td>
-            <td><?php echo $row['MONTHS']['MAR']; ?></td>
-            <td><?php echo $row['MONTHS']['APR']; ?></td>
-            <td><?php echo $row['MONTHS']['MAY']; ?></td>
-            <td><?php echo $row['MONTHS']['JUN']; ?></td>
-            <td><?php echo $row['MONTHS']['JUL']; ?></td>
-            <td><?php echo $row['MONTHS']['AUG']; ?></td>
-            <td><?php echo $row['MONTHS']['SEP']; ?></td>
-            <td><?php echo $row['MONTHS']['OCT']; ?></td>
-            <td><?php echo $row['MONTHS']['NOV']; ?></td>
-            <td><?php echo $row['MONTHS']['DEC']; ?></td>
-            <td><?php echo $row['TOT']; ?></td>
+            <td><b><?php echo $row['YEAR']; ?></b></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['JAN']); ?>"><?php echo $options->formatMonthValue($row, 'JAN'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['FEB']); ?>"><?php echo $options->formatMonthValue($row, 'FEB'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['MAR']); ?>"><?php echo $options->formatMonthValue($row, 'MAR'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['APR']); ?>"><?php echo $options->formatMonthValue($row, 'APR'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['MAY']); ?>"><?php echo $options->formatMonthValue($row, 'MAY'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['JUN']); ?>"><?php echo $options->formatMonthValue($row, 'JUN'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['JUL']); ?>"><?php echo $options->formatMonthValue($row, 'JUL'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['AUG']); ?>"><?php echo $options->formatMonthValue($row, 'AUG'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['SEP']); ?>"><?php echo $options->formatMonthValue($row, 'SEP'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['OCT']); ?>"><?php echo $options->formatMonthValue($row, 'OCT'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['NOV']); ?>"><?php echo $options->formatMonthValue($row, 'NOV'); ?></td>
+            <td class="<?php echo $options->getTickClass($row['MONTHS']['DEC']); ?>"><?php echo $options->formatMonthValue($row, 'DEC'); ?></td>
+            <td><b><?php echo $options->format($row['TOT']); ?></b></td>
         </tr>
     <?php endforeach; ?>
     <tr>
         <td colspan="13"><b style="float: left; margin-left: 18px">TOTAL COMPOUNDED RETURN</b></td>
-        <td><b><?php echo $options->tableData['TOTAL_COMPOUNDED']; ?></b></td>
+        <td><b><?php echo $options->format($options->tableData['TOTAL_COMPOUNDED']); ?></b></td>
     </tr>
 </table>

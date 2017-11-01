@@ -51,22 +51,31 @@ class TableOptions extends MyFXBookOptions {
             }
         };
 
-        foreach ($body as &$row) {
-            $row['MONTHS'] = array_map(function ($val) {
-                if ($val === 0) {
-                    return '0.00%';
-                } else if ($val !== 'N/A') {
-                    return number_format($val, 2) . "%";
-                }
-                return $val;
-            }, $row['MONTHS']);
-
-            $row['TOT'] = number_format($row['TOT'], 2) . "%";
-        }
-
         $this->tableData = [
             'BODY' => $body,
-            'TOTAL_COMPOUNDED' => number_format($total_compounded, 2) . "%"
+            'TOTAL_COMPOUNDED' => $total_compounded
         ];
+    }
+
+    public function getTickClass($value) {
+        if($value !== 'N/A'){
+            $num = floatval($value);
+            return $num >= 0 ? 'table-tick-green' : 'table-tick-red';
+        }
+        return $value;
+    }
+
+    public function format($value) {
+        if ($value === 0) {
+            return '0.00%';
+        } else if ($value !== 'N/A') {
+            return number_format($value, 2) . "%";
+        }
+        return $value;
+    }
+
+    public function formatMonthValue(array $data, string $month) {
+        $value = $data['MONTHS'][$month];
+        return $this->format($value);
     }
 }

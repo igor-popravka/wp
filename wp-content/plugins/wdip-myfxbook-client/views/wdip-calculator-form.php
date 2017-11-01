@@ -1,6 +1,6 @@
 <?php
 /** @var \WDIP\Plugin\Viewer $this */
-/** @var \WDIP\Plugin\ChartOptions $options */
+/** @var \WDIP\Plugin\CalculatorFormOptions $options */
 
 $options = $this->getOptions();
 ?>

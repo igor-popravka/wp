@@ -95,8 +95,10 @@
 
 table.quest-monthly-table td.table-tick-green{
     color: green!important;
+    background-color: #EEFDEC;
 }
 
 table.quest-monthly-table td.table-tick-red{
     color: red!important;
+    background-color: #FAEAEA;
 }

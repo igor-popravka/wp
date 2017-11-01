@@ -74,7 +74,7 @@ class TableOptions extends MyFXBookOptions {
         return $value;
     }
 
-    public function formatMonthValue(array $data, string $month) {
+    public function formatMonthValue(array $data, $month) {
         $value = $data['MONTHS'][$month];
         return $this->format($value);
     }

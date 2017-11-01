@@ -93,10 +93,10 @@
     font-weight: bold;
 }
 
-td.table-tick-green{
-    color: green;
+table.quest-monthly-table td.table-tick-green{
+    color: green!important;
 }
 
-td.table-tick-red{
-    color: red;
+table.quest-monthly-table td.table-tick-red{
+    color: red!important;
 }

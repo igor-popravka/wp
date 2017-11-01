@@ -5,7 +5,7 @@
 $options = $this->getOptions();
 ?>
 
-<table class="chart">
+<table class="chart quest-monthly-table">
     <tr>
         <th>YEAR</th>
         <th>JAN</th>

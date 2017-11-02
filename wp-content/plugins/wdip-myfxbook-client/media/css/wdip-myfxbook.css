@@ -93,6 +93,10 @@
     font-weight: bold;
 }
 
+table.quest-monthly-table tr td {
+    background-color: white!important;
+}
+
 table.quest-monthly-table td.table-tick-green{
     color: green!important;
     background-color: #EEFDEC!important;

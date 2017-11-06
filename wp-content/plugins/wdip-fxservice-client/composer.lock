@@ -1,0 +1,93 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "badb38fb9ee1af3b126197b34c12170b",
+    "packages": [
+        {
+            "name": "austinhyde/iniparser",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/austinhyde/IniParser.git",
+                "reference": "3b5a925ac99619d198d8ff93958913ca3311f266"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/austinhyde/IniParser/zipball/3b5a925ac99619d198d8ff93958913ca3311f266",
+                "reference": "3b5a925ac99619d198d8ff93958913ca3311f266",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "IniParser": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Till Klampaeckel",
+                    "email": "till@php.net",
+                    "homepage": "http://till.klampaeckel.de/"
+                },
+                {
+                    "name": "Austin Hyde",
+                    "email": "austin109@gmail.com"
+                }
+            ],
+            "description": "A Zend_Config_Ini like parser for .ini files.",
+            "keywords": [
+                "configuration"
+            ],
+            "time": "2014-04-12 14:28:42"
+        },
+        {
+            "name": "wdip/wpp-builder",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/igor-popravka/wpp-builder.git",
+                "reference": "9bc13f21703d79cb5d9c264fa2c6030e5f0cdfc7"
+            },
+            "require": {
+                "austinhyde/iniparser": "dev-master",
+                "php": " >= 5.4"
+            },
+            "type": "lib",
+            "autoload": {
+                "psr-4": {
+                    "WDIP\\WPPBuilder\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Igor Popravka",
+                    "email": "ipopravka@hotmail.com"
+                }
+            ],
+            "time": "2017-11-06 14:27:42"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "austinhyde/iniparser": 20,
+        "wdip/wpp-builder": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": " >= 5.4"
+    },
+    "platform-dev": []
+}

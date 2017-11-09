@@ -11,13 +11,18 @@ class MyFXBookClient {
     const OPTIONS_GROUP = 'wdip-myfxbook-client-group';
     const OPTIONS_PAGE = 'wdip-myfxbook-client-page';
     const OPTIONS_NAME = 'wdip-myfxbook-client-options';
-    const SHORT_CODE_NAME = 'myfxbook-client';
+    const SHORT_CODE_MYFXBOOK = 'myfxbook-client';
+    const SHORT_CODE_FXBLUE = 'fxblue-client';
 
     const TYPE_MONTH_GROWTH = 'month-growth';
     const TYPE_TOTAL_GROWTH = 'total-growth';
     const TYPE_MONTHLY_GAIN_LOSS = 'monthly-gain-loss';
     const TYPE_CALCULATOR_FORM = 'calculator-form';
     const TYPE_MONTH_GROWTH_TABLE = 'month-growth-table';
+    const TYPE_FXBLUE_CUMULATIVE_PIPS = 'cumulative-pips';
+    const TYPE_FXBLUE_CUMULATIVE_RETURN = 'cumulative-return';
+    const TYPE_FXBLUE_MONTHLY_RETURN = 'monthly-return';
+    const TYPE_FXBLUE_ACCOUNT_STATS = 'account-stats';
 
     const ENV_DEV = 'dev';
     const ENV_LIVE = 'live';
@@ -46,7 +51,8 @@ class MyFXBookClient {
             add_action('wp_ajax_wdip-calculate-growth-data', $this->getCallback('ajaxCalculateGrowthData'));
         } else {
             add_action('wp_enqueue_scripts', $this->getCallback('initEnqueueScripts'));
-            add_shortcode(self::SHORT_CODE_NAME, $this->getCallback('applyShortCode'));
+            add_shortcode(self::SHORT_CODE_MYFXBOOK, $this->getCallback('applyMyFXBookShortCode'));
+            add_shortcode(self::SHORT_CODE_FXBLUE, $this->getCallback('applyFXBlueShortCode'));
         }
         register_deactivation_hook(WDIP_PLUGIN, $this->getCallback('delSettings'));
     }
@@ -61,7 +67,7 @@ class MyFXBookClient {
         );
     }
 
-    public function applyShortCode($attr = [], $content = null) {
+    public function applyMyFXBookShortCode($attr = [], $content = null) {
         $attributes = new ShortCodeAttributes($attr);
 
         if ($attributes->has('accountid') && $attributes->has('charttype')) {
@@ -86,6 +92,30 @@ class MyFXBookClient {
                     $options = new TableOptions($attributes);
                     $content .= Viewer::instance()->render('quest-monthly-table', $options);
                     break;
+            }
+        }
+
+        return $content;
+    }
+
+    public function applyFXBlueShortCode($attr = [], $content = null) {
+        $attributes = new ShortCodeAttributes($attr);
+
+        if ($attributes->has('charttype')) {
+            switch ($attributes->charttype) {
+                case self::TYPE_FXBLUE_MONTHLY_RETURN:
+                    $attributes->charttype = sprintf('ch_%s', str_replace('-', '', $attributes->charttype));
+                    $options = new FXBlueColumnChartOptions($attributes);
+                    $content .= Viewer::instance()->render('myfxbook-chart', $options);
+                    break;
+                case self::TYPE_FXBLUE_CUMULATIVE_PIPS:
+                case self::TYPE_FXBLUE_CUMULATIVE_RETURN:
+                    $attributes->charttype = sprintf('ch_%s', str_replace('-', '', $attributes->charttype));
+                    
+                    $options = new FXBlueLineChartOptions($attributes);
+                    $content .= Viewer::instance()->render('myfxbook-chart', $options);
+                    break;
+
             }
         }
 
@@ -219,6 +249,28 @@ class MyFXBookClient {
             if (!empty($response)) return $response;
         }
         return null;
+    }
+
+    public function httpGET($url, $params = [], $toJSON = true) {
+        if (!empty($params)) {
+            $url .= '?' . build_query($params);
+        }
+
+        $response = wp_remote_get($url);
+
+        if (wp_remote_retrieve_response_code($response) == 200) {
+            if ($toJSON) {
+                return json_decode(wp_remote_retrieve_body($response));
+            } else {
+                return wp_remote_retrieve_body($response);
+            }
+        }
+
+        return null;
+    }
+
+    public function prepareURL($host, $action = '') {
+        return sprintf('%s%s', $host, (!empty($action) ? "/{$action}" : ''));
     }
 
     public function getAccountInfo($id) {

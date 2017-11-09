@@ -19,7 +19,9 @@ namespace WDIP\Plugin;
 
 class ShortCodeAttributes extends MyFXBookData {
     public function __construct(array $data) {
-        $data['accountid'] = explode(',', $data['accountid']);
+        if(isset($data['accountid'])){
+            $data['accountid'] = explode(',', $data['accountid']); 
+        }
 
         if (isset($data['fee'])) {
             $data['fee'] = explode(',', $data['fee']);

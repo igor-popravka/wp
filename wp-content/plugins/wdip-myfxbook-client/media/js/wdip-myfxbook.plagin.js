@@ -4,9 +4,12 @@
             switch (options.charttype) {
                 case 'month-growth':
                 case 'monthly-gain-loss':
+                case 'ch_monthlyreturn':
                     $.proxy(plugin.initColumnsChart, this, options)();
                     break;
                 case 'total-growth':
+                case 'ch_cumulativepips':
+                case 'ch_cumulativereturn':
                     $.proxy(plugin.initLineChart, this, options)();
             }
         },
@@ -129,8 +132,11 @@
             switch (options.charttype) {
                 case 'month-growth':
                 case 'monthly-gain-loss':
+                case 'ch_monthlyreturn':
                     return plugin.getMonthGrowthOptions(options);
                 case 'total-growth':
+                case 'ch_cumulativepips':
+                case 'ch_cumulativereturn':
                     return plugin.getTotalGrowthOptions(options);
             }
             return {}

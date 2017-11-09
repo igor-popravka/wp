@@ -135,4 +135,35 @@ class MyFXBookModel {
 
         return RuntimeCache::instance()->getValue($key, 0);
     }
+
+    public function getFXBlueChartData($chart) {
+        $key = md5("FXBLUE-DATA-{$chart}");
+        $result = RuntimeCache::instance()->getValue($key);
+
+        if (!isset($result)) {
+            $value = null;
+            $result = $this->getClient()->httpGET(
+                $this->getClient()->prepareURL('https://www.fxblue.com/fxbluechart.aspx'),
+                [
+                    'c' => $chart,
+                    'id' => 'binaforexquest'
+                ],
+                false
+            );
+
+            $result = preg_replace('/[\s\t\r\n]+/', '', $result);
+
+            if (preg_match("/data\.addRows\(\[(?:\['Start',0\],)?(.+)\]\);/", $result, $match) > 0) {
+                $value = json_decode("[{$match[1]}]");
+            }
+
+            RuntimeCache::instance()->setValue($key, $value);
+        }
+
+        return RuntimeCache::instance()->getValue($key, []);
+    }
+
+    public function getClient() {
+        return MFBClient::instance();
+    }
 }

@@ -9,24 +9,6 @@ class FXBlueColumnChartOptions extends MyFXBookOptions {
     protected function generate() {
         $raw_data = $this->getModel()->getFXBlueChartData($this->charttype);
 
-        /*$group_data = [];
-        foreach ($raw_data as $data) {
-            $date = \DateTime::createFromFormat("m/d/Y", $data[0]);
-
-            $group_name = $date->format('Ym');
-            if (!isset($group_data[$group_name])) {
-                $group_data[$group_name] = [];
-            }
-
-            $day = intval($date->format('d'));
-            $group_data[$group_name][$day] = [$date->format("M 'y"), $data[1]];
-        }
-
-        $group_data = array_map(function ($val) {
-            $lastDay = max(array_keys($val));
-            return $val[$lastDay];
-        }, $group_data);*/
-
         $categories = array_map(function ($val) {
             $date = \DateTime::createFromFormat("m/d/Y", $val[0]);
             return $date->format("M 'y");

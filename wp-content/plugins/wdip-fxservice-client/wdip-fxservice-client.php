@@ -1,8 +1,8 @@
 <?php
 /**
- * @Plugin Name: MyFXBook Client
- * @Description: MyFXBook Client plugin, which builds charts/graphs using the data from  API <a href="https://www.myfxbook.com/api">https://www.myfxbook.com/api</a>
- * @Version:     2.0.13
+ * @Plugin Name: FX-Service Client
+ * @Description: Builds Charts/Graphs/Tables using the data from API of the FX-Service Clients: [<a href="https://www.myfxbook.com/api">MYFXBook</a>] [<a href="https://www.fxblue.com">FXBlue Client</a>]
+ * @Version:     2.1.1
  * @Author:      Igor Popravka
  * @Author URI:  https://www.upwork.com/freelancers/~010854a54a1811f970
  */

@@ -8,9 +8,10 @@ namespace WDIP\Plugin;
  * Time: 14:32
  */
 class MyFXBookClient {
-    const OPTIONS_GROUP = 'wdip-myfxbook-client-group';
-    const OPTIONS_PAGE = 'wdip-myfxbook-client-page';
-    const OPTIONS_NAME = 'wdip-myfxbook-client-options';
+    const OPTIONS_GROUP = 'wdip-fxservice-client-group';
+    const OPTIONS_PAGE = 'wdip-fxservice-client-page';
+    const OPTIONS_NAME = 'wdip-fxservice-client-options';
+
     const SHORT_CODE_MYFXBOOK = 'myfxbook-client';
     const SHORT_CODE_FXBLUE = 'fxblue-client';
 
@@ -19,6 +20,7 @@ class MyFXBookClient {
     const TYPE_MONTHLY_GAIN_LOSS = 'monthly-gain-loss';
     const TYPE_CALCULATOR_FORM = 'calculator-form';
     const TYPE_MONTH_GROWTH_TABLE = 'month-growth-table';
+
     const TYPE_FXBLUE_CUMULATIVE_PIPS = 'cumulative-pips';
     const TYPE_FXBLUE_CUMULATIVE_RETURN = 'cumulative-return';
     const TYPE_FXBLUE_MONTHLY_RETURN = 'monthly-return';
@@ -59,8 +61,8 @@ class MyFXBookClient {
 
     public function initAdminMenu() {
         add_options_page(
-            __('MyFXBook Client Settings'),
-            'MyFXBook Client',
+            __('FX-Service Client (MyFXBook) Settings'),
+            'FX-Service Client',
             8,
             self::OPTIONS_PAGE,
             $this->getCallback('renderOptionsPage')
@@ -115,7 +117,10 @@ class MyFXBookClient {
                     $options = new FXBlueLineChartOptions($attributes);
                     $content .= Viewer::instance()->render('myfxbook-chart', $options);
                     break;
-
+                case self::TYPE_FXBLUE_ACCOUNT_STATS:
+                    $options = new FXBlueAccountStatTableOptions($attributes);
+                    $content .= Viewer::instance()->render('fxblue-acc-stat-table', $options);
+                    break;
             }
         }
 

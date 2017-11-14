@@ -7,7 +7,7 @@ namespace WDIP\Plugin;
  * Date: 09.11.2016
  * Time: 14:32
  */
-class MyFXBookClient {
+class FXServiceClient {
     const OPTIONS_GROUP = 'wdip-fxservice-client-group';
     const OPTIONS_PAGE = 'wdip-fxservice-client-page';
     const OPTIONS_NAME = 'wdip-fxservice-client-options';

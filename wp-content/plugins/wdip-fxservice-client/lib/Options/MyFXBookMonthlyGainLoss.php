@@ -1,26 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igor.popravka
- * Date: 31.10.2017
- * Time: 23:44
- */
-
-namespace WDIP\Plugin;
+namespace WDIP\Plugin\Options;
 
 /**
  * @property $series
  * @property $categories
  */
-class MonthlyGainLossOptions extends MyFXBookOptions{
-    protected function generate() {
-        $raw_data = [];
-        foreach ($this->accountid as $id) {
-            $raw_data = array_merge($raw_data, $this->getModel()->getGainLossData($id));
-        }
-
+class MyFXBookMonthlyGainLoss extends AbstractOptions {
+    protected function generate(array $data) {
         $group_data = [];
-        foreach ($raw_data as $dt) {
+        foreach ($data as $dt) {
             $combine_data = array_combine($dt[0], $dt[1]);
             foreach ($combine_data as $date => $val) {
                 if (isset($group_data[$date])) {
@@ -50,5 +38,13 @@ class MonthlyGainLossOptions extends MyFXBookOptions{
             'color' => 'rgba(124, 181, 236, 0.7)',
             'negativeColor' => 'rgba(255, 79, 79, 0.7)'
         ]];
+    }
+
+    protected function getData() {
+        $result = [];
+        foreach ($this->accountid as $id) {
+            $result = array_merge($result, $this->getModel()->getGainLossData($id));
+        }
+        return $result;
     }
 }

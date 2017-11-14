@@ -1,23 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igor.popravka
- * Date: 01.11.2017
- * Time: 1:04
- */
+namespace WDIP\Plugin\Options;
 
-namespace WDIP\Plugin;
-
+use WDIP\Plugin\FXServiceData;
+use WDIP\Plugin\MyFXBookConfig;
 /**
  * @property $series
- * @property MyFXBookData $CalcFormOptions
+ * @property FXServiceData $CalcFormOptions
  * @property $adminUrl
  */
-class CalculatorFormOptions extends MyFXBookOptions {
-    protected function generate() {
-        $this->CalcFormOptions = new MyFXBookData(MyFXBookConfig::instance()->CALCULATOR_FORM);
+class MyFXBookCalculatorForm extends AbstractOptions {
+    protected function generate(array $data) {
+        $this->CalcFormOptions = new FXServiceData(MyFXBookConfig::instance()->CALCULATOR_FORM);
         $this->adminUrl = admin_url('admin-ajax.php');
-        $this->series = [
+        $this->series = $data;
+    }
+
+    protected function getData() {
+        return [
             [
                 "name" => "Total",
                 "data" => [],

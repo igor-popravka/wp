@@ -1,15 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igor.popravka
- * Date: 01.10.2017
- * Time: 1:19
- */
-
 namespace WDIP\Plugin;
 
 
-class MyFXBookConfig {
+class FXServiceConfig {
     /** @var \ArrayObject */
     private $config;
     

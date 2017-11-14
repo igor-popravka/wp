@@ -1,5 +1,5 @@
 <?php
-namespace WDIP\Plugin;
+namespace WDIP\Plugin\Options;
 
 /**
  * @author: igor.popravka
@@ -9,21 +9,14 @@ namespace WDIP\Plugin;
  * @property $tableData
  * @property $defaultcells
  */
-class TableOptions extends MyFXBookOptions {
+class MyFXBookTable extends AbstractOptions {
     const NOT_AVAILABLE = 'N/A';
 
-    protected function generate() {
+    protected function generate(array $data) {
         $this->generateDefaultCells();
 
-        $data = [];
-        $total_compounded = 0;
-        foreach ($this->accountid as $id) {
-            $data = array_merge($data, $this->getModel()->getGainLossData($id));
-            $total_compounded += $this->getModel()->getTotalGainData($id);
-        }
-
         $body = [];
-        foreach ($data as $dt) {
+        foreach ($data['DATA'] as $dt) {
             $combine_data = array_combine($dt[0], $dt[1]);
             list($year, $months, $total) = $this->getDefaultTableRow();
 
@@ -57,10 +50,21 @@ class TableOptions extends MyFXBookOptions {
             }
         };
 
-        $this->tableData = [
-            'BODY' => $body,
-            'TOTAL_COMPOUNDED' => $total_compounded
+        $this->tableData = array_merge($data, ['BODY' => $body]);
+    }
+
+    protected function getData() {
+        $result = [
+            'DATA' => [],
+            'TOTAL_COMPOUNDED' => 0
         ];
+
+        foreach ($this->accountid as $id) {
+            $result['DATA'] = array_merge($result['DATA'], $this->getModel()->getGainLossData($id));
+            $result['TOTAL_COMPOUNDED'] += $this->getModel()->getTotalGainData($id);
+        }
+
+        return $result;
     }
 
     public function getTickClass($value) {

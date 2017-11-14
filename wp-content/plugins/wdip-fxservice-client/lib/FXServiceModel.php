@@ -1,7 +1,7 @@
 <?php
 namespace WDIP\Plugin;
 
-use WDIP\Plugin\MyFXBookClient as MFBClient;
+use WDIP\Plugin\FXServiceClient as MFBClient;
 use WDIP\Plugin\MyFXBookConfig as MFBConfig;
 
 /**
@@ -9,7 +9,7 @@ use WDIP\Plugin\MyFXBookConfig as MFBConfig;
  * Date: 24.10.2017
  * Time: 11:51
  */
-class MyFXBookModel {
+class FXServiceModel {
 
     public function getGrowthData($account_id, $basic = 0) {
         $key = md5("MYFXBOOK-GROWTH-DATA-{$account_id}");

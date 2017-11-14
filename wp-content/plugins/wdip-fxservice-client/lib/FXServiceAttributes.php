@@ -17,7 +17,7 @@ namespace WDIP\Plugin;
  * @property $fee
  */
 
-class ShortCodeAttributes extends MyFXBookData {
+class FXServiceAttributes extends FXServiceData {
     public function __construct(array $data) {
         if(isset($data['accountid'])){
             $data['accountid'] = explode(',', $data['accountid']); 

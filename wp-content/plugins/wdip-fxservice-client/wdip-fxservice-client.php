@@ -10,6 +10,6 @@
 define("WDIP_ROOT", __DIR__);
 define("WDIP_PLUGIN", __FILE__);
 
-require WDIP_ROOT . '/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-\WDIP\Plugin\MyFXBookClient::instance()->build();
+\WDIP\Plugin\Plugin::instance()->build(__DIR__ . '/wdip-plugin-config.ini');

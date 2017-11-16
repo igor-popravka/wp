@@ -7,7 +7,7 @@ namespace WDIP\Plugin;
  * Date: 09.11.2016
  * Time: 14:32
  */
-class FXServiceClient {
+class Plugin {
     const OPTIONS_GROUP = 'wdip-fxservice-client-group';
     const OPTIONS_PAGE = 'wdip-fxservice-client-page';
     const OPTIONS_NAME = 'wdip-fxservice-client-options';
@@ -44,7 +44,9 @@ class FXServiceClient {
         return self::$instance;
     }
 
-    public function build() {
+    public function build($config) {
+        Services::config()->parse($config);
+        
         if (is_admin()) {
             add_action('admin_menu', $this->getCallback('initAdminMenu'));
             add_action('admin_init', $this->getCallback('initSettings'));
@@ -53,18 +55,20 @@ class FXServiceClient {
             add_action('wp_ajax_wdip-calculate-growth-data', $this->getCallback('ajaxCalculateGrowthData'));
         } else {
             add_action('wp_enqueue_scripts', $this->getCallback('initEnqueueScripts'));
-            add_shortcode(self::SHORT_CODE_MYFXBOOK, $this->getCallback('applyMyFXBookShortCode'));
-            add_shortcode(self::SHORT_CODE_FXBLUE, $this->getCallback('applyFXBlueShortCode'));
+            
+            foreach (Services::config()->SHORT_CODES as $code){
+                add_shortcode($code['name'], $this->getCallback($code['callback']));
+            }
         }
         register_deactivation_hook(WDIP_PLUGIN, $this->getCallback('delSettings'));
     }
 
     public function initAdminMenu() {
         add_options_page(
-            __('FX-Service Client (MyFXBook) Settings'),
-            'FX-Service Client',
-            8,
-            self::OPTIONS_PAGE,
+            __(Services::config()->PLUGIN_OPTIONS['page_title']),
+            Services::config()->PLUGIN_OPTIONS['menu_title'],
+            Services::config()->PLUGIN_OPTIONS['page_capability'],
+            Services::config()->PLUGIN_OPTIONS['menu_slug'],
             $this->getCallback('renderOptionsPage')
         );
     }
@@ -113,7 +117,7 @@ class FXServiceClient {
                 case self::TYPE_FXBLUE_CUMULATIVE_PIPS:
                 case self::TYPE_FXBLUE_CUMULATIVE_RETURN:
                     $attributes->charttype = sprintf('ch_%s', str_replace('-', '', $attributes->charttype));
-                    
+
                     $options = new FXBlueLineChartOptions($attributes);
                     $content .= Viewer::instance()->render('myfxbook-chart', $options);
                     break;

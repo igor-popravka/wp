@@ -2,7 +2,7 @@
 namespace WDIP\Plugin;
 
 
-class FXServiceRequest extends FXServiceData {
+class Request extends ObjectData {
     public function __construct() {
         parent::__construct($_POST);
     }

@@ -6,7 +6,7 @@ namespace WDIP\Plugin;
  * Date: 24.10.2017
  * Time: 11:42
  */
-class FXServiceRuntimeCache {
+class Cache {
     private static $instance;
 
     private static $cache = [];

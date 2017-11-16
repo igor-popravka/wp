@@ -1,33 +1,36 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igor.popravka
- * Date: 14.11.2017
- * Time: 16:27
- */
-
 namespace WDIP\Plugin\Attributes;
 
 
-abstract class CollectionAttributes implements \Iterator {
+abstract class AbstractCollectionAttributes implements \Iterator {
     private $collection = [];
 
-    abstract protected function getConfigurationMap();
+    abstract protected function getAttrConfig ();
+
+    protected function fromArray(array $attributes) {
+        $config = $this->getAttrConfig();
+        
+        foreach ($attributes as $name => $value) {
+            $attr = new Attribute($name, isset($config[$name]) ? $config[$name] : []);
+            
+            if($attr->isEmpty()){
+                $attr->setValue($attr->getDefault());
+            }
+            
+            $this->add($attr);
+        }
+    }
+    
+    public function toArray(){
+        $attributes = [];
+        foreach ($this->collection as $attr){
+            /** @var Attribute $attr */
+            $attributes = array_merge($attributes, $attr->toArray());
+        }
+        return $attributes;
+    }
 
     public function add(Attribute $attr) {
-        $map = $this->getConfigurationMap();
-
-        if (isset($map[$attr->getName()])) {
-            $value = $attr->getValue();
-            if (!isset($value) && isset($map[$attr->getName()]['default-value'])) {
-
-                
-
-            }
-        }
-
-        //if(empty($attr->getValue()) && )
-
         $this->collection[$attr->getName()] = $attr;
     }
 

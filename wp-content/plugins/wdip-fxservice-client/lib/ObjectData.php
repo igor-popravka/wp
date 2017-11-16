@@ -1,15 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: igor.popravka
- * Date: 01.10.2017
- * Time: 8:40
- */
-
 namespace WDIP\Plugin;
 
 
-class FXServiceData implements \Iterator, \ArrayAccess {
+class ObjectData implements \Iterator, \ArrayAccess {
     private $data = [];
 
     public function offsetExists($offset) {
@@ -49,7 +42,7 @@ class FXServiceData implements \Iterator, \ArrayAccess {
     }
 
     public function __construct($data = []) {
-        $this->__init($data);
+        $this->fromArray($data);
     }
 
     public function has($name) {
@@ -76,9 +69,18 @@ class FXServiceData implements \Iterator, \ArrayAccess {
         unset($this->data[$name]);
     }
 
-    private function __init($data) {
+    private function fromArray(array $data) {
         foreach ($data as $name => $value) {
-            $this[$name] = $value;
+            $this[$this->normaliseName($name)] = $value;
         }
+    }
+    
+    private function normaliseName($name){
+        $names = explode('-', $name);
+        $name = strtolower(array_shift($names));
+        foreach ($names as $part){
+            $name .= ucfirst($part);
+        }
+        return $name;
     }
 }

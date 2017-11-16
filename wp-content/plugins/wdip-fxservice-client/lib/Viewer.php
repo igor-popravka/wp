@@ -1,8 +1,8 @@
 <?php
 namespace WDIP\Plugin;
 
-class FXServiceViewer {
-    /** @var FXServiceData */
+class Viewer {
+    /** @var ObjectData */
     private $options;
 
     private static $instance;
@@ -10,7 +10,7 @@ class FXServiceViewer {
     private function __construct() {
     }
 
-    public function render($name, FXServiceData $options = null) {
+    public function render($name, ObjectData $options = null) {
         $this->options = $options;
         $file = sprintf("%s/views/wdip-%s.php", WDIP_ROOT, $name);
         if (file_exists($file)) {
@@ -21,7 +21,7 @@ class FXServiceViewer {
         return '';
     }
     
-    public function output($name, FXServiceData $options = null) {
+    public function output($name, ObjectData $options = null) {
         echo $this->render($name, $options);
     }
 

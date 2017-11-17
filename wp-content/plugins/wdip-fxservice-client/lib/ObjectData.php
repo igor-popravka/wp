@@ -42,7 +42,7 @@ class ObjectData implements \Iterator, \ArrayAccess {
     }
 
     public function __construct($data = []) {
-        $this->fromArray($data);
+        $this->fromObjectArray($data);
     }
 
     public function has($name) {
@@ -54,22 +54,22 @@ class ObjectData implements \Iterator, \ArrayAccess {
     }
 
     public function __isset($name) {
-        return isset($this->data[$name]);
+        return isset($this->data[$this->normaliseName($name)]);
     }
 
     public function __set($name, $value) {
-        $this->data[$name] = is_numeric($value) ? floatval($value) : $value;
+        $this->data[$this->normaliseName($name)] = is_numeric($value) ? floatval($value) : $value;
     }
 
     public function __get($name) {
-        return $this->__isset($name) ? $this->data[$name] : null;
+        return $this->__isset($name) ? $this->data[$this->normaliseName($name)] : null;
     }
 
     public function __unset($name) {
-        unset($this->data[$name]);
+        unset($this->data[$this->normaliseName($name)]);
     }
 
-    private function fromArray(array $data) {
+    public function fromObjectArray($data) {
         foreach ($data as $name => $value) {
             $this[$this->normaliseName($name)] = $value;
         }

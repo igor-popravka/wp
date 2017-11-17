@@ -17,11 +17,7 @@ class HTTP {
         return self::$instance;
     }
 
-    public function get($url, $params = [], $response_type = self::RESPONSE_TYPE_JSON) {
-        if (!empty($params)) {
-            $url .= '?' . build_query($params);
-        }
-
+    public function get($url, $response_type = self::RESPONSE_TYPE_JSON) {
         $response = wp_remote_get($url);
 
         if (wp_remote_retrieve_response_code($response) == 200) {
@@ -33,5 +29,13 @@ class HTTP {
         }
 
         return null;
+    }
+
+    public function buildQuery($host, $action = '', $params = []) {
+        return sprintf('%s%s%s',
+            $host,
+            (!empty($action) ? "/{$action}" : ''),
+            (!empty($params) ? '?' . build_query($params) : '')
+        );
     }
 }

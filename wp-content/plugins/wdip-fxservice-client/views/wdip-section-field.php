@@ -1,8 +1,6 @@
 <?php
 /** @var \WDIP\Plugin\Viewer $this */
-/** @var \WDIP\Plugin\MyFXBookData $options */
-
-use WDIP\Plugin\MyFXBookClient as MFBClient;
+/** @var \WDIP\Plugin\ObjectData $options */
 
 $options = $this->getOptions();
 ?>
@@ -11,6 +9,6 @@ $options = $this->getOptions();
        value="<?= $options->value; ?>"
 <div>
     <p class="description">
-        <?= nl2br(__($options->description, MFBClient::OPTIONS_PAGE)); ?>
+        <?= nl2br(__($options->description, $options->options_page)); ?>
     </p>
 </div>

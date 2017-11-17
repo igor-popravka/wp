@@ -7,9 +7,9 @@
  * @Author URI:  https://www.upwork.com/freelancers/~010854a54a1811f970
  */
 
-define("WDIP_ROOT", __DIR__);
-define("WDIP_PLUGIN", __FILE__);
+//define("WDIP_ROOT", __DIR__);
+//define("WDIP_PLUGIN", __FILE__);
 
 require __DIR__ . '/vendor/autoload.php';
 
-\WDIP\Plugin\Plugin::instance()->build(__DIR__ . '/wdip-plugin-config.ini');
+\WDIP\Plugin\Plugin::instance()->build(__FILE__,__DIR__ . '/wdip-plugin-config.ini');

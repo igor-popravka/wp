@@ -204,4 +204,25 @@ class Model {
     public function getClient() {
         return MFBClient::instance();
     }
+
+    public function getMyFXBookSession($login, $password){
+        $cache_key = 'MY-FX-BOOK-SESSION';
+        $session = Services::cache()->getValue($cache_key, null);
+
+        if (!isset($session)) {
+            $query = Services::http()->buildQuery(Services::config()->MYFXBOOK_API['url'], 'api/login.json', [
+                'email' => $login,
+                'password' => $password
+            ]);
+
+            $result = Services::http()->get($query);
+
+            if (!$result->error) {
+                $session = $result->session;
+                Services::cache()->setValue($cache_key, $session);
+            }
+        }
+
+        return $session;
+    }
 }

@@ -13,14 +13,22 @@ class Attribute {
     private $default = null;
     private $type = self::TYPE_STRING;
 
-    public function __construct($name, array $config = []) {
+    public function __construct($name, $value = null, array $config = []) {
         $this->name = $name;
+        $this->value = $value;
 
         foreach ($config as $property => $value) {
-            if (in_array($property, ['value', 'required', 'default', 'type'])) {
+            if (in_array($property, ['required', 'default', 'type'])) {
                 $this->{$property} = $value;
             }
         }
+    }
+
+    public function isValid() {
+        if ($this->isRequired()) {
+            return !$this->isEmpty();
+        }
+        return true;
     }
 
     public function __toString() {
@@ -86,8 +94,8 @@ class Attribute {
                 return $value;
         }
     }
-    
-    public function toArray(){
+
+    public function toArray() {
         return [$this->getName() => $this->getValue()];
     }
 }

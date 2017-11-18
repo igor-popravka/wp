@@ -7,6 +7,15 @@ namespace WDIP\Plugin;
  * Time: 11:42
  */
 class Cache {
+    const CACHE_KEY_MYFXBOOK_SESSION = 'KEY-MYFXBOOK-SESSION';
+    const CACHE_KEY_MYFXBOOK_ACCOUNTS = 'KEY-MYFXBOOK-ACCOUNTS';
+    const CACHE_KEY_MYFXBOOK_TOTAL_GAIN_DATA = 'KEY-MYFXBOOK-TOTAL-GAIN-DATA';
+    const CACHE_KEY_MYFXBOOK_MONTHLY_GAIN_LOSS_DATA = 'KEY-MYFXBOOK-MONTHLY-GAIN-LOSS-DATA';
+    const CACHE_KEY_MYFXBOOK_GROWTH_DATA = 'KEY-MYFXBOOK-GROWTH-DATA';
+    const CACHE_KEY_FXBLUE_GROWTH_DATA = 'KEY-FXBLUE-GROWTH-DATA';
+    const CACHE_KEY_FXBLUE_ACCOUNT_DATA = 'KEY-FXBLUE-ACCOUNT-DATA';
+    const CACHE_KEY_PLUGIN_VERSION = 'KEY-PLUGIN-VERSION';
+
     private static $instance;
 
     private static $cache = [];
@@ -14,25 +23,32 @@ class Cache {
     private function __construct() {
     }
 
-    public static function instance(){
-        if(!isset(self::$instance)){
+    public static function instance() {
+        if (!isset(self::$instance)) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    public function getValue($key, $default = null){
-        if($this->isSetKey($key)){
-            return self::$cache[$key];
+    public function get($key, $default = null) {
+        if ($this->has($key)) {
+            return self::$cache[$this->key($key)];
         }
         return $default;
     }
 
-    public function setValue($key, $value){
-        self::$cache[$key] = $value;
+    public function set($key, $value) {
+        self::$cache[$this->key($key)] = $value;
     }
 
-    public function isSetKey($key){
-        return isset(self::$cache[$key]);
+    public function has($key) {
+        return isset(self::$cache[$this->key($key)]);
+    }
+
+    private function key($key) {
+        if (is_array($key)) {
+            $key = implode('-', $key);
+        }
+        return md5(strtoupper($key));
     }
 }

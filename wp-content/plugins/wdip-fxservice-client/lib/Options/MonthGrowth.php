@@ -1,11 +1,15 @@
 <?php
 namespace WDIP\Plugin\Options;
 
+use WDIP\Plugin\Plugin;
+use WDIP\Plugin\Services;
+
 /**
  * @property $series
  * @property $categories
+ * @property $serviceClient
  */
-class MyFXBookMonthGrowth extends AbstractOptions {
+class MonthGrowth extends AbstractOptions {
     protected function generate(array $data) {
         $group_data = [];
         foreach ($data as $item) {
@@ -44,12 +48,18 @@ class MyFXBookMonthGrowth extends AbstractOptions {
     }
 
     protected function getData() {
-        $result = [];
-        $basic = 0;
-        foreach ($this->accountid as $id) {
-            $result = array_merge($result, $this->getModel()->getGrowthData($id, $basic));
-            $basic = $result[count($result) - 1][1];
+        switch ($this->serviceClient){
+            case Plugin::SHORT_CODE_MYFXBOOK:
+                $basic = 0;
+                $result = [];
+                foreach ($this->accountId as $id) {
+                    $result = array_merge($result, Services::model()->getGrowthData($id, $basic));
+                    $basic = $result[count($result) - 1][1];
+                }
+                return $result;
+            case Plugin::SHORT_CODE_FXBLUE:
+                return Services::model()->getFXBlueChartData($this->chartType);
         }
-        return $result;
+        return [];
     }
 }

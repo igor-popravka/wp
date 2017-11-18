@@ -6,30 +6,30 @@ class Viewer {
     private $options;
 
     private static $instance;
-    
+
     private function __construct() {
     }
 
-    public function render($name, ObjectData $options = null) {
+    public function render($file, ObjectData $options = null) {
         $this->options = $options;
-        $file = sprintf("%s/views/wdip-%s.php", WDIP_ROOT, $name);
-        if (file_exists($file)) {
+        $path = Services::system()->getViewPath($file);
+        if (file_exists($path)) {
             ob_start();
-            require $file;
+            require $path;
             return ob_get_clean();
         }
         return '';
     }
-    
-    public function output($name, ObjectData $options = null) {
-        echo $this->render($name, $options);
+
+    public function output($file, ObjectData $options = null) {
+        echo $this->render($file, $options);
     }
 
-    public function getOptions(){
+    public function getOptions() {
         return $this->options;
     }
-    
-    public static function instance (){
+
+    public static function instance() {
         if (!isset(self::$instance)) {
             self::$instance = new self;
         }

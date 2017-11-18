@@ -5,25 +5,51 @@ namespace WDIP\Plugin\Attributes;
 abstract class AbstractCollectionAttributes implements \Iterator {
     private $collection = [];
 
-    abstract protected function getAttrConfig ();
+    abstract protected function getAttrConfig();
 
-    protected function fromArray(array $attributes) {
-        $config = $this->getAttrConfig();
-        
-        foreach ($attributes as $name => $value) {
-            $attr = new Attribute($name, isset($config[$name]) ? $config[$name] : []);
-            
-            if($attr->isEmpty()){
-                $attr->setValue($attr->getDefault());
-            }
-            
+    public function __construct(array $attributes) {
+        $this->fromConfig();
+        $this->fromArray($attributes);
+    }
+
+    private function fromConfig() {
+        $attributes = $this->getAttrConfig();
+        foreach ($attributes as $name => $config) {
+            $attr = new Attribute($name, null, $config);
             $this->add($attr);
         }
     }
-    
-    public function toArray(){
+
+    protected function fromArray(array $attributes) {
+        foreach ($attributes as $name => $value) {
+            if ($this->has($name)) {
+                $attr = $this->get($name);
+                $attr->setValue($value);
+
+                if ($attr->isEmpty()) {
+                    $attr->setValue($attr->getDefault());
+                }
+            } else {
+                $attr = new Attribute($name, $value);
+            }
+
+            $this->add($attr);
+        }
+    }
+
+    public function isValid() {
+        foreach ($this->collection as $attr) {
+            /** @var Attribute $attr */
+            if (!$attr->isValid()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function toArray() {
         $attributes = [];
-        foreach ($this->collection as $attr){
+        foreach ($this->collection as $attr) {
             /** @var Attribute $attr */
             $attributes = array_merge($attributes, $attr->toArray());
         }
@@ -34,6 +60,10 @@ abstract class AbstractCollectionAttributes implements \Iterator {
         $this->collection[$attr->getName()] = $attr;
     }
 
+    /**
+     * @param $name
+     * @return Attribute
+     */
     public function get($name) {
         return $this->has($name) ? $this->collection[$name] : null;
     }

@@ -1,14 +1,6 @@
 <?php
 namespace WDIP\Plugin;
 
-use WDIP\Plugin\FXServiceClient as MFBClient;
-use WDIP\Plugin\MyFXBookConfig as MFBConfig;
-
-/**
- * @author: igor.popravka
- * Date: 24.10.2017
- * Time: 11:51
- */
 class Model {
     private static $instance;
 
@@ -22,59 +14,62 @@ class Model {
         return self::$instance;
     }
 
-    public function getGrowthData($account_id, $basic = 0) {
-        $key = md5("MYFXBOOK-GROWTH-DATA-{$account_id}");
-        $result = RuntimeCache::instance()->getValue($key);
+    public function getMyFXBookGrowthData($account_id, $basic = 0) {
+        $result = Services::cache()->get([Cache::CACHE_KEY_MYFXBOOK_GROWTH_DATA, $account_id, $basic], null);
 
-        if (empty($result) && ($account_info = $this->getAccountInfo($account_id))) {
-            $data = [];
+        if (!isset($result)) {
+            $account_info = $this->getMyFXBookAccountInfo($account_id);
 
-            if (MFBClient::instance()->getEnvironment() == MFBClient::ENV_DEV) {
-                $result = MFBClient::instance()->getDataFromJSON("myfxbook.get-daily-gain-{$account_id}", true);
-            } else {
-                $config = MFBConfig::instance()->MYFXBOOK_API->daily_gain;
-                $result = MFBClient::instance()->httpRequest($config->url, [
-                    'session' => MFBClient::instance()->getSession(),
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['myfxbook_url'],
+                'api/get-daily-gain.json',
+                [
+                    'session' => $this->getMyFXBookSession(),
                     'id' => $account_id,
                     'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
                     'end' => (new \DateTime())->format('Y-m-d')
-                ]);
-            }
+                ]
+            );
+
+            $result = Services::http()->get($query);
 
             if (!$result->error) {
-                $data = array_map(function ($dt) use ($basic) {
+                $result = array_map(function ($dt) use ($basic) {
                     return [
-                        //\DateTime::createFromFormat("m/d/Y", $dt[0]->date)->getTimestamp(),
                         $dt[0]->date,
                         $dt[0]->value + $basic
                     ];
                 }, $result->dailyGain);
-            }
 
-            RuntimeCache::instance()->setValue($key, $data);
+                Services::cache()->set([Cache::CACHE_KEY_MYFXBOOK_GROWTH_DATA, $account_id, $basic], $result);
+            }
         }
 
-        return RuntimeCache::instance()->getValue($key, []);
+        return $result;
     }
 
-    public function getGainLossData($account_id) {
-        $key = md5("MYFXBOOK-MONTHLY-GAIN-LOSS-DATA-{$account_id}");
-        $result = RuntimeCache::instance()->getValue($key);
+    public function getMyFXBookMonthlyGainLossData($account_id) {
+        $result = Services::cache()->get([Cache::CACHE_KEY_MYFXBOOK_MONTHLY_GAIN_LOSS_DATA, $account_id], null);
 
-        if (empty($result) && $account_info = $this->getAccountInfo($account_id)) {
-            $monthly_gain_los = MFBConfig::instance()->SERIES->monthly_gain_los;
+        if (!isset($result)) {
+            $account_info = $this->getMyFXBookAccountInfo($account_id);
             $startYear = intval(\DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y'));
             $endYear = intval(\DateTime::createFromFormat('m/d/Y H:i', $account_info->lastUpdateDate)->format('Y'));
             $data = [];
 
             while ($startYear <= $endYear) {
-                $result = MFBClient::instance()->httpRequest($monthly_gain_los->url, [
-                    'chartType' => 3,
-                    'monthType' => 0,
-                    'accountOid' => $account_id,
-                    'startDate' => "{$startYear}-01-01",
-                    'endDate' => (new \DateTime())->format('Y-m-d')
-                ]);
+                $query = Services::http()->buildQuery(
+                    Services::config()->FXSERVICE_API['myfxbook_url'],
+                    'charts.json',
+                    [
+                        'chartType' => 3,
+                        'monthType' => 0,
+                        'accountOid' => $account_id,
+                        'startDate' => "{$startYear}-01-01",
+                        'endDate' => (new \DateTime())->format('Y-m-d')
+                    ]
+                );
+                $result = Services::http()->get($query);
 
                 if (isset($result->categories) && isset($result->series)) {
                     $series_data = array_map(function ($v) {
@@ -87,33 +82,16 @@ class Model {
                 $startYear++;
             }
 
-            RuntimeCache::instance()->setValue($key, $data);
+            $result = !empty($data) ? $data : null;
+            Services::cache()->set([Cache::CACHE_KEY_MYFXBOOK_MONTHLY_GAIN_LOSS_DATA, $account_id], $result);
         }
 
-        return RuntimeCache::instance()->getValue($key, []);
+        return $result;
     }
 
-    public function getAccountInfo($account_id) {
-        $key = md5("MYFXBOOK-ACCOUNTS");
-        $accounts = RuntimeCache::instance()->getValue($key);
-
-        if (empty($accounts)) {
-            if (MFBClient::instance()->getEnvironment() == MFBClient::ENV_DEV) {
-                $result = MFBClient::instance()->getDataFromJSON("myfxbook.get-my-accounts", true);
-            } else {
-                $result = MFBClient::instance()->httpRequest('api/get-my-accounts.json', [
-                    'session' => MFBClient::instance()->getSession()
-                ]);
-            }
-
-            if (!$result->error) {
-                $accounts = $result->accounts;
-                RuntimeCache::instance()->setValue($key, $accounts);
-            }
-        }
-
-        if (RuntimeCache::instance()->isSetKey($key)) {
-            foreach (RuntimeCache::instance()->getValue($key) as $acc) {
+    public function getMyFXBookAccountInfo($account_id) {
+        if ($accounts = $this->getMyFXBookAccounts()) {
+            foreach ($accounts as $acc) {
                 if ($acc->id == $account_id) {
                     return $acc;
                 }
@@ -123,106 +101,146 @@ class Model {
         throw new \Exception("Account {$account_id} didn't found in MyFxBook accounts.");
     }
 
-    public function getTotalGainData($account_id) {
-        $key = md5("MYFXBOOK-TOTAL-GAIN-DATA-{$account_id}");
-        $result = RuntimeCache::instance()->getValue($key);
+    public function getMyFXBookTotalGainData($account_id) {
+        $result = Services::cache()->get([Cache::CACHE_KEY_MYFXBOOK_TOTAL_GAIN_DATA, $account_id], null);
 
-        if (!isset($result) && $account_info = $this->getAccountInfo($account_id)) {
-            $value = null;
-            $config = MFBConfig::instance()->MYFXBOOK_API->gain;
-            $result = MFBClient::instance()->httpRequest($config->url, [
-                'session' => MFBClient::instance()->getSession(),
-                'id' => $account_id,
-                'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
-                'end' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->lastUpdateDate)->format('Y-m-d')
-            ]);
+        if (!isset($result)) {
+            $account_info = $this->getMyFXBookAccountInfo($account_id);
+
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['myfxbook_url'],
+                'api/get-gain.json',
+                [
+                    'session' => $this->getMyFXBookSession(),
+                    'id' => $account_id,
+                    'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
+                    'end' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->lastUpdateDate)->format('Y-m-d')
+                ]
+            );
+
+            $result = Services::http()->get($query);
 
             if (!$result->error) {
-                $value = $result->value;
+                $result = $result->value;
+                Services::cache()->set([Cache::CACHE_KEY_MYFXBOOK_TOTAL_GAIN_DATA, $account_id], $result);
             }
-
-            RuntimeCache::instance()->setValue($key, $value);
         }
 
-        return RuntimeCache::instance()->getValue($key, 0);
+        return $result;
     }
 
-    public function getFXBlueChartData($chart) {
-        $key = md5("FXBLUE-DATA-{$chart}");
-        $result = RuntimeCache::instance()->getValue($key);
+    public function getFXBlueGrowthData($account_id) {
+        $result = Services::cache()->get([Cache::CACHE_KEY_FXBLUE_GROWTH_DATA, $account_id], null);
 
         if (!isset($result)) {
-            $value = null;
-            $result = $this->getClient()->httpGET(
-                $this->getClient()->prepareURL('https://www.fxblue.com/fxbluechart.aspx'),
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['fxblue_url'],
+                'fxbluechart.aspx',
                 [
-                    'c' => $chart,
-                    'id' => 'binaforexquest'
-                ],
-                false
+                    'c' => 'ch_cumulativereturn',
+                    'id' => $account_id
+                ]
             );
 
-            $result = preg_replace('/[\s\t\r\n]+/', '', $result);
+            if ($result = Services::http()->get($query, HTTP::RESPONSE_TYPE_RAW)) {
+                $result = preg_replace('/[\s\t\r\n]+/', '', $result);
 
-            if (preg_match("/data\.addRows\(\[(?:\['Start',0\],)?(.+)\]\);/", $result, $match) > 0) {
-                $value = json_decode("[{$match[1]}]");
+                if (preg_match("/data\.addRows\(\[(?:\['Start',0\],)?(.+)\]\);/", $result, $match) > 0) {
+                    $result = json_decode("[{$match[1]}]");
+                    Services::cache()->set([Cache::CACHE_KEY_FXBLUE_GROWTH_DATA, $account_id], $result);
+                }
             }
-
-            RuntimeCache::instance()->setValue($key, $value);
         }
 
-        return RuntimeCache::instance()->getValue($key, []);
+        return $result;
     }
 
-    public function getFXBlueAccountStatData(){
-        $key = md5("FXBLUE-DATA-ACCOUNT-STAT");
-        $result = RuntimeCache::instance()->getValue($key);
+    public function getFXBlueAccountData($account_id) {
+        $result = Services::cache()->get([Cache::CACHE_KEY_FXBLUE_ACCOUNT_DATA, $account_id], null);
 
         if (!isset($result)) {
-            $value = null;
-            $result = $this->getClient()->httpGET(
-                $this->getClient()->prepareURL('https://www.fxblue.com/fxbluechart.aspx'),
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['fxblue_url'],
+                'fxbluechart.aspx',
                 [
                     'c' => 'ch_accountstats',
-                    'id' => 'binaforexquest'
-                ],
-                false
+                    'id' => $account_id
+                ]
             );
 
-            $result = preg_replace('/[\s\t\r\n]+/', '', $result);
+            if ($result = Services::http()->get($query, HTTP::RESPONSE_TYPE_RAW)) {
+                $result = preg_replace('/[\s\t\r\n]+/', '', $result);
 
-            if (preg_match("/document\.ChartData=(\{.+\});/", $result, $match) > 0) {
-                $value = json_decode($match[1]);
+                if (preg_match("/document\.ChartData=(\{.+\});/", $result, $match) > 0) {
+                    $result = json_decode($match[1]);
+                    Services::cache()->set([Cache::CACHE_KEY_FXBLUE_ACCOUNT_DATA, $account_id], $result);
+                }
             }
-
-            RuntimeCache::instance()->setValue($key, $value);
         }
 
-        return RuntimeCache::instance()->getValue($key, new \stdClass());
+        return $result;
     }
 
-    public function getClient() {
-        return MFBClient::instance();
-    }
-
-    public function getMyFXBookSession($login, $password){
-        $cache_key = 'MY-FX-BOOK-SESSION';
-        $session = Services::cache()->getValue($cache_key, null);
-
-        if (!isset($session)) {
-            $query = Services::http()->buildQuery(Services::config()->MYFXBOOK_API['url'], 'api/login.json', [
-                'email' => $login,
-                'password' => $password
-            ]);
+    public function getMyFXBookSession($login = null, $password = null) {
+        $session = null;
+        if (isset($login) && isset($password)) {
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['myfxbook_url'],
+                'api/login.json',
+                [
+                    'email' => $login,
+                    'password' => $password
+                ]
+            );
 
             $result = Services::http()->get($query);
 
             if (!$result->error) {
                 $session = $result->session;
-                Services::cache()->setValue($cache_key, $session);
+                Services::cache()->set(Cache::CACHE_KEY_MYFXBOOK_SESSION, $session);
+            }
+        } else if (!($session = Services::cache()->get(Cache::CACHE_KEY_MYFXBOOK_SESSION, null))) {
+            $options = get_option(Services::config()->PLUGIN_SETTINGS['options_name']);
+            $login = isset($options['login_field']) ? $options['login_field'] : null;
+            $password = isset($options['password_field']) ? $options['password_field'] : null;
+
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['myfxbook_url'],
+                'api/login.json',
+                [
+                    'email' => $login,
+                    'password' => $password
+                ]
+            );
+
+            $result = Services::http()->get($query);
+
+            if (!$result->error) {
+                $session = $result->session;
+                Services::cache()->set(Cache::CACHE_KEY_MYFXBOOK_SESSION, $session);
             }
         }
 
         return $session;
+    }
+
+    public function getMyFXBookAccounts() {
+        $accounts = Services::cache()->get(Cache::CACHE_KEY_MYFXBOOK_ACCOUNTS, null);
+
+        if (!isset($accounts)) {
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['myfxbook_url'],
+                'api/get-my-accounts.json',
+                ['session' => $this->getMyFXBookSession()]
+            );
+
+            $result = Services::http()->get($query);
+
+            if (!$result->error) {
+                $accounts = $result->accounts;
+                Services::cache()->set(Cache::CACHE_KEY_MYFXBOOK_ACCOUNTS, $accounts);
+            }
+        }
+        return $accounts;
     }
 }

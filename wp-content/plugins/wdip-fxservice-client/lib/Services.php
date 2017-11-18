@@ -30,4 +30,8 @@ class Services {
     public static function http(){
         return HTTP::instance();
     }
+
+    public static function system(){
+        return System::instance();
+    }
 }

@@ -109,7 +109,7 @@
             e.preventDefault();
             $.post(opt.url, $.extend({
                 action: 'wdip-calculate-growth-data',
-                id: opt.accID
+                accountId: opt.accID
             }, context.data('post_data')), function (result) {
                 var series = null;
                 if (result.success) {

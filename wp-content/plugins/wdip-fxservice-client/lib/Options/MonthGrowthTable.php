@@ -1,15 +1,15 @@
 <?php
 namespace WDIP\Plugin\Options;
 
+use WDIP\Plugin\Plugin;
+use WDIP\Plugin\Services;
+
 /**
- * @author: igor.popravka
- * Date: 24.10.2017
- * Time: 13:18
- *
  * @property $tableData
  * @property $defaultcells
+ * @property $serviceClient
  */
-class MyFXBookTable extends AbstractOptions {
+class MonthGrowthTable extends AbstractOptions {
     const NOT_AVAILABLE = 'N/A';
 
     protected function generate(array $data) {
@@ -59,11 +59,18 @@ class MyFXBookTable extends AbstractOptions {
             'TOTAL_COMPOUNDED' => 0
         ];
 
-        foreach ($this->accountid as $id) {
-            $result['DATA'] = array_merge($result['DATA'], $this->getModel()->getGainLossData($id));
-            $result['TOTAL_COMPOUNDED'] += $this->getModel()->getTotalGainData($id);
+        switch ($this->serviceClient){
+            case Plugin::SHORT_CODE_MYFXBOOK:
+                foreach ($this->accountId as $id) {
+                    $result['DATA'] = array_merge($result['DATA'], Services::model()->getGainLossData($id));
+                    $result['TOTAL_COMPOUNDED'] += Services::model()->getTotalGainData($id);
+                }
+                return $result;
+            case Plugin::SHORT_CODE_FXBLUE:
+                $result['DATA'] = Services::model()->getFXBlueChartData($this->chartType);
+                $result['TOTAL_COMPOUNDED'] = Services::model()->getFXBlueChartData($this->chartType);
+                return $result;
         }
-
         return $result;
     }
 

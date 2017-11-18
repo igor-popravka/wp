@@ -1,6 +1,6 @@
 <?php
 /** @var \WDIP\Plugin\Viewer $this */
-/** @var \WDIP\Plugin\CalculatorFormOptions $options */
+/** @var \WDIP\Plugin\Options\CalculatorForm $options */
 
 $options = $this->getOptions();
 ?>
@@ -53,7 +53,7 @@ $options = $this->getOptions();
             url: '<?= $options->adminUrl; ?>',
             chart_options: JSON.parse('<?= $options->CalcFormOptions->toJSON(); ?>')
         };
-        console.log(options);
+
         $('#<?= $options->uid ?>').FXCalculator(options);
     })(jQuery);
 </script>

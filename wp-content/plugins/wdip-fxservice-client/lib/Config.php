@@ -2,11 +2,11 @@
 namespace WDIP\Plugin;
 
 /**
- * @property array SHORT_CODES
  * @property array OPTIONS_PAGE
  * @property array PLUGIN_SETTINGS
-*/
-class Config extends ObjectData{
+ * @property array FXSERVICE_API
+ */
+class Config extends ObjectData {
     private static $instance;
 
     public static function instance() {
@@ -15,9 +15,9 @@ class Config extends ObjectData{
         }
         return self::$instance;
     }
-    
-    public function parse($file){
-        $data = (new \IniParser())->parse($file);
+
+    public function parse($file) {
+        $data = (new \IniParser())->parse(Services::system()->getFullPath($file));
         $this->fromObjectArray($data);
     }
 }

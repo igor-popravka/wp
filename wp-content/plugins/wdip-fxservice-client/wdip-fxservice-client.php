@@ -12,4 +12,8 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-\WDIP\Plugin\Plugin::instance()->build(__FILE__,__DIR__ . '/wdip-plugin-config.ini');
+use WDIP\Plugin\Services;
+
+Services::system()->registerPlugin(__FILE__);
+
+Services::plugin()->build('wdip-plugin-config.ini');

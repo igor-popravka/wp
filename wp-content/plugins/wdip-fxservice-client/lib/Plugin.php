@@ -149,69 +149,23 @@ class Plugin {
 
     public function ajaxCalculateGrowthData() {
         $request = new Request();
-        $response = [
-            'total_amount' => '$0.00',
-            'fee_amount' => '$0.00',
-            'gain_amount' => '$0.00',
-            'series' => [
-                'categories' => [],
-                'total_amount_data' => [],
-                'fee_amount_data' => [],
-                'gain_amount_data' => []
-            ]
-        ];
-
         if ($request->validate(['accountId', 'start', 'amount', 'fee'])) {
-            $daily_gain = MyFXBookConfig::instance()->SERIES->daily_gain;
-            $dailyGainData = [];
-            foreach ($request->id as $id) {
-                $result = $this->httpRequest($daily_gain->url, [
-                    'session' => $this->getSession(),
-                    'id' => $id,
-                    'start' => $request->start,
-                    'end' => (new \DateTime())->format('Y-m-d')
-                ]);
-                if (!$result->error) {
-                    if (empty($dailyGainData)) {
-                        $start_value = 0;
-                    } else {
-                        $start_value = $dailyGainData[count($dailyGainData) - 1][1];
-                    }
-
-                    foreach ($result->dailyGain as $data) {
-                        $dailyGainData[] = [
-                            \DateTime::createFromFormat('m/d/Y', $data[0]->date)->format('M, y'),
-                            $start_value + $data[0]->value
-                        ];
-                    }
-                }
-            }
-
-            if (!empty($dailyGainData)) {
-                $amount = floatval($request->amount);
-                $fee = floatval($request->fee);
-                $total_amount = $fee_amount = $gain = 0;
-                foreach ($dailyGainData as $item) {
-                    $name = $item[0];
-                    if (empty($response['series']['categories'])) {
-                        $gain = 0;
-                    } else {
-                        $gain = round($amount * ($item[1] / 100), 2);
-                    }
-                    $total_amount = ($amount + $gain);
-                    $fee_amount = round($gain * $fee, 2);
-                    $response['series']['categories'][] = $name;
-                    $response['series']['total_amount_data'][] = $total_amount;
-                    $response['series']['gain_amount_data'][] = $gain;
-                    $response['series']['fee_amount_data'][] = $fee_amount;
-                }
-                $response['total_amount'] = '$' . $total_amount;
-                $response['fee_amount'] = '$' . $fee_amount;
-                $response['gain_amount'] = '$' . $gain;
-            }
+            $option = new CalculatorForm($request);
+            $response = $option->calculate();
+            
             wp_send_json_success($response);
         } else {
-            wp_send_json_success($response);
+            wp_send_json_success( [
+                'total_amount' => '$0.00',
+                'fee_amount' => '$0.00',
+                'gain_amount' => '$0.00',
+                'series' => [
+                    'categories' => [],
+                    'total_amount_data' => [],
+                    'fee_amount_data' => [],
+                    'gain_amount_data' => []
+                ]
+            ]);
         }
     }
 
@@ -276,25 +230,25 @@ class Plugin {
     private function renderShortCode(ShortCodeAttributes $attributes) {
         $content = '';
 
-        switch ($attributes->get('chart-type')) {
+        switch ($attributes->get('chart-type')->getValue()) {
             case ShortCodeAttributes::CHART_TYPE_MONTH_GROWTH:
-                $options = new MonthGrowth($attributes);
+                $options = new MonthGrowth(new ObjectData($attributes->toArray()));
                 $content = Services::viewer()->render('fxservice-chart', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_TOTAL_GROWTH:
-                $options = new TotalGrowth($attributes);
+                $options = new TotalGrowth(new ObjectData($attributes->toArray()));
                 $content = Services::viewer()->render('fxservice-chart', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_MONTHLY_GAIN_LOSS:
-                $options = new MonthlyGainLoss($attributes);
+                $options = new MonthlyGainLoss(new ObjectData($attributes->toArray()));
                 $content = Services::viewer()->render('fxservice-chart', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_CALCULATOR_FORM:
-                $options = new CalculatorForm($attributes);
+                $options = new CalculatorForm(new ObjectData($attributes->toArray()));
                 $content = Services::viewer()->render('calculator-form', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_MONTH_GROWTH_TABLE:
-                $options = new MonthGrowthTable($attributes);
+                $options = new MonthGrowthTable(new ObjectData($attributes->toArray()));
                 $content = Viewer::instance()->render('month-growth-table', $options);
         }
 

@@ -62,13 +62,13 @@ class MonthGrowthTable extends AbstractOptions {
         switch ($this->serviceClient){
             case Plugin::SHORT_CODE_MYFXBOOK:
                 foreach ($this->accountId as $id) {
-                    $result['DATA'] = array_merge($result['DATA'], Services::model()->getGainLossData($id));
-                    $result['TOTAL_COMPOUNDED'] += Services::model()->getTotalGainData($id);
+                    $result['DATA'] = array_merge($result['DATA'], Services::model()->getMyFXBookMonthlyGainLossData($id));
+                    $result['TOTAL_COMPOUNDED'] += Services::model()->getMyFXBookTotalAccountGain($id);
                 }
                 return $result;
             case Plugin::SHORT_CODE_FXBLUE:
-                $result['DATA'] = Services::model()->getFXBlueChartData($this->chartType);
-                $result['TOTAL_COMPOUNDED'] = Services::model()->getFXBlueChartData($this->chartType);
+                $result['DATA'] = Services::model()->getFXBlueMonthlyGainLossData($this->accountId);
+                $result['TOTAL_COMPOUNDED'] = 0;
                 return $result;
         }
         return $result;

@@ -49,11 +49,11 @@ class MonthlyGainLoss extends AbstractOptions {
             case Plugin::SHORT_CODE_MYFXBOOK:
                 $result = [];
                 foreach ($this->accountId as $id) {
-                    $result = array_merge($result, Services::model()->getGainLossData($id));
+                    $result = array_merge($result, Services::model()->getMyFXBookMonthlyGainLossData($id));
                 }
                 return $result;
             case Plugin::SHORT_CODE_FXBLUE:
-                return Services::model()->getFXBlueChartData($this->chartType);
+                return Services::model()->getFXBlueMonthlyGainLossData($this->accountId);
         }
         return [];
     }

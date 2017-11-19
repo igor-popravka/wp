@@ -101,7 +101,7 @@ class Model {
         throw new \Exception("Account {$account_id} didn't found in MyFxBook accounts.");
     }
 
-    public function getMyFXBookTotalGainData($account_id) {
+    public function getMyFXBookTotalAccountGain($account_id) {
         $result = Services::cache()->get([Cache::CACHE_KEY_MYFXBOOK_TOTAL_GAIN_DATA, $account_id], null);
 
         if (!isset($result)) {
@@ -148,6 +148,32 @@ class Model {
                 if (preg_match("/data\.addRows\(\[(?:\['Start',0\],)?(.+)\]\);/", $result, $match) > 0) {
                     $result = json_decode("[{$match[1]}]");
                     Services::cache()->set([Cache::CACHE_KEY_FXBLUE_GROWTH_DATA, $account_id], $result);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public function getFXBlueMonthlyGainLossData ($account_id) {
+        $result = Services::cache()->get([Cache::CACHE_KEY_FXBLUE_MONTHLY_GAIN_LOSS_DATA, $account_id], null);
+
+        if (!isset($result)) {
+            $query = Services::http()->buildQuery(
+                Services::config()->FXSERVICE_API['fxblue_url'],
+                'fxbluechart.aspx',
+                [
+                    'c' => 'ch_cumulativereturn',
+                    'id' => $account_id
+                ]
+            );
+
+            if ($result = Services::http()->get($query, HTTP::RESPONSE_TYPE_RAW)) {
+                $result = preg_replace('/[\s\t\r\n]+/', '', $result);
+
+                if (preg_match("/data\.addRows\(\[(?:\['Start',0\],)?(.+)\]\);/", $result, $match) > 0) {
+                    $result = json_decode("[{$match[1]}]");
+                    Services::cache()->set([Cache::CACHE_KEY_FXBLUE_MONTHLY_GAIN_LOSS_DATA, $account_id], $result);
                 }
             }
         }

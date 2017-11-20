@@ -49,9 +49,9 @@ $options = $this->getOptions();
     (function ($) {
         var options = {
             fee: JSON.parse('<?= json_encode($options->fee); ?>'),
-            accID: JSON.parse('<?= json_encode($options->accountid); ?>'),
+            accID: JSON.parse('<?= json_encode($options->accountId); ?>'),
             url: '<?= $options->adminUrl; ?>',
-            chart_options: JSON.parse('<?= $options->CalcFormOptions->toJSON(); ?>')
+            chart_options: JSON.parse('[]')
         };
 
         $('#<?= $options->uid ?>').FXCalculator(options);

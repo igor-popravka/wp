@@ -1,5 +1,5 @@
 <?php
-use WDIP\Plugin\Services;
+use WDIP\Plugin\Plugin;
 
 ?>
 
@@ -19,11 +19,11 @@ use WDIP\Plugin\Services;
     <form action="options.php" method="post">
         <?php
         // output security Servicesfields
-        settings_fields(Services::config()->PLUGIN_SETTINGS['options_group']);
+        \settings_fields(Plugin::SETTINGS_OPTIONS_GROUP);
         // output setting sections and their fields
-        do_settings_sections(Services::config()->PLUGIN_SETTINGS['options_name']);
+        \do_settings_sections(Plugin::SETTINGS_OPTIONS_PAGE);
         // output save settings button
-        submit_button('Save Settings');
+        \submit_button('Save Settings');
         ?>
     </form>
 </div>

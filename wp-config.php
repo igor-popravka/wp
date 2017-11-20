@@ -43,16 +43,16 @@ define('DB_COLLATE', '');
  * Fixes Feeds as well
  * Defines the proxy adresse.
  */
-define( 'WP_PROXY_HOST',          '172.16.73.13' );
+//define( 'WP_PROXY_HOST',          '172.16.73.13' );
 // Defines the proxy port.
-define( 'WP_PROXY_PORT',          '64321' );
+//define( 'WP_PROXY_PORT',          '64321' );
 // Defines the proxy username.
 //define( 'WP_PROXY_USERNAME',      'my_user_name' );
 // Defines the proxy password.
 //define( 'WP_PROXY_PASSWORD',      'my_password' );
 // Allows you to define some adresses which
 // shouldn't be passed through a proxy.
-define( 'WP_PROXY_BYPASS_HOSTS',  'localhost' );
+//define( 'WP_PROXY_BYPASS_HOSTS',  'localhost' );
 
 /**#@+
  * Authentication Unique Keys and Salts.

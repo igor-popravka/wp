@@ -17,6 +17,11 @@ use WDIP\Plugin\Options\TotalGrowth;
  * Time: 14:32
  */
 class Plugin {
+    const SETTINGS_OPTIONS_PAGE = 'fxservice-client-settings';
+    const SETTINGS_OPTIONS_GROUP = 'fxservice-client-myfxbook-group';
+    const SETTINGS_OPTIONS_NAME = 'fxservice-client-myfxbook-options';
+    const SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION = 'fxservice-client-myfxbook-auth-section';
+
     const SHORT_CODE_MYFXBOOK = 'myfxbook-client';
     const SHORT_CODE_FXBLUE = 'fxblue-client';
 
@@ -52,10 +57,10 @@ class Plugin {
 
     public function initAdminMenu() {
         add_options_page(
-            __(Services::config()->OPTIONS_PAGE['page_title']),
-            Services::config()->OPTIONS_PAGE['menu_title'],
-            Services::config()->OPTIONS_PAGE['page_capability'],
-            Services::config()->OPTIONS_PAGE['menu_slug'],
+            __('FX-Service Client (MyFXBook) Settings', self::SETTINGS_OPTIONS_PAGE),
+            'FX-Service Client',
+            8,
+            self::SETTINGS_OPTIONS_PAGE,
             $this->getCallback('renderOptionsPage')
         );
     }
@@ -69,51 +74,49 @@ class Plugin {
     public function initPluginSettings() {
         /** registration setting */
         register_setting(
-            Services::config()->PLUGIN_SETTINGS['options_group'],
-            Services::config()->PLUGIN_SETTINGS['options_name'],
+            self::SETTINGS_OPTIONS_GROUP,
+            self::SETTINGS_OPTIONS_NAME,
             $this->getCallback('onBeforeSaveSettings')
         );
 
         /** registration section */
-        $section = Services::config()->PLUGIN_SETTINGS['section_code'];
-        $page = Services::config()->OPTIONS_PAGE['menu_slug'];
+        //$section = Services::config()->PLUGIN_SETTINGS['section_code'];
+        //$page = Services::config()->OPTIONS_PAGE['menu_slug'];
 
         add_settings_section(
-            $section,
-            __('Account Registration Data', $page),
+            self::SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION,
+            __('Account Registration Data', self::SETTINGS_OPTIONS_PAGE),
             $this->getCallback('renderSectionNotify'),
-            $page
+            self::SETTINGS_OPTIONS_PAGE
         );
 
         /** registration fields */
         add_settings_field(
             'login_field',
-            __('Login', $page),
+            __('Login', self::SETTINGS_OPTIONS_PAGE),
             $this->getCallback('renderSectionField'),
-            $page,
-            $section,
+            self::SETTINGS_OPTIONS_PAGE,
+            self::SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION,
             [
                 'label_for' => 'login_field',
                 'tag' => 'input',
                 'type' => 'text',
                 'description' => 'Enter your a login. It will be used only to authorization in API',
-                'options_name' => Services::config()->PLUGIN_SETTINGS['options_name'],
-                'options_page' => $page
+                'options_name' => self::SETTINGS_OPTIONS_NAME
             ]
         );
         add_settings_field(
             'password_field',
-            __('Password', $page),
+            __('Password', self::SETTINGS_OPTIONS_PAGE),
             $this->getCallback('renderSectionField'),
-            $page,
-            $section,
+            self::SETTINGS_OPTIONS_PAGE,
+            self::SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION,
             [
                 'label_for' => 'password_field',
                 'tag' => 'input',
                 'type' => 'password',
                 'description' => 'Enter your a password. It will be used only to authorization in API',
-                'options_name' => Services::config()->PLUGIN_SETTINGS['options_name'],
-                'options_page' => $page
+                'options_name' => self::SETTINGS_OPTIONS_NAME
             ]
         );
     }
@@ -123,8 +126,8 @@ class Plugin {
 
         if (empty($session)) {
             add_settings_error(
-                Services::config()->PLUGIN_SETTINGS['error']['session_empty']['code'],
-                Services::config()->PLUGIN_SETTINGS['error']['session_empty']['code'],
+                self::SETTINGS_OPTIONS_NAME,
+                'myfxbook-api-session-empty',
                 __(Services::config()->PLUGIN_SETTINGS['error']['session_empty']['message'], Services::config()->OPTIONS_PAGE['menu_slug'])
             );
         }
@@ -189,8 +192,8 @@ class Plugin {
     }
 
     public function onDeactivationSettings() {
-        unregister_setting(Services::config()->PLUGIN_SETTINGS['options_group'], Services::config()->PLUGIN_SETTINGS['options_name']);
-        delete_option(Services::config()->PLUGIN_SETTINGS['options_name']);
+        unregister_setting(self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_OPTIONS_NAME);
+        delete_option(self::SETTINGS_OPTIONS_NAME);
     }
 
     /**
@@ -256,7 +259,7 @@ class Plugin {
     }
 
     public function getCallback($fun_name) {
-        return [self::instance(), $fun_name];
+        return [$this, $fun_name];
     }
 
     public function getVersion() {

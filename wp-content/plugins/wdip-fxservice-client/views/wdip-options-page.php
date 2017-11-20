@@ -1,5 +1,5 @@
 <?php
-use WDIP\Plugin\MyFXBookClient as MFBClient;
+use WDIP\Plugin\Services;
 
 ?>
 
@@ -18,10 +18,10 @@ use WDIP\Plugin\MyFXBookClient as MFBClient;
     </p>
     <form action="options.php" method="post">
         <?php
-        // output security fields
-        settings_fields(MFBClient::OPTIONS_GROUP);
+        // output security Servicesfields
+        settings_fields(Services::config()->PLUGIN_SETTINGS['options_group']);
         // output setting sections and their fields
-        do_settings_sections(MFBClient::OPTIONS_PAGE);
+        do_settings_sections(Services::config()->PLUGIN_SETTINGS['options_name']);
         // output save settings button
         submit_button('Save Settings');
         ?>

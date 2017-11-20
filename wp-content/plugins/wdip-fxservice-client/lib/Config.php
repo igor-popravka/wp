@@ -18,6 +18,6 @@ class Config extends ObjectData {
 
     public function parse($file) {
         $data = (new \IniParser())->parse(Services::system()->getFullPath($file));
-        $this->fromObjectArray($data);
+        $this->fromArray($data);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /** @var \WDIP\Plugin\Viewer $this */
-/** @var \WDIP\Plugin\TableOptions $options */
+/** @var \WDIP\Plugin\Options\MonthGrowthTable $options */
 
 $options = $this->getOptions();
 ?>

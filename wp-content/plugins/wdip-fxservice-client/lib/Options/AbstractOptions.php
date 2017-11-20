@@ -27,7 +27,7 @@ abstract class AbstractOptions extends ObjectData {
      */
     abstract protected function getData();
 
-    public function __construct(ObjectData $data = null) {
+    public function __construct(array $data = []) {
         parent::__construct($data);
         $this->init();
     }

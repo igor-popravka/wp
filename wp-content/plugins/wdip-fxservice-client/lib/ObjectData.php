@@ -1,9 +1,26 @@
 <?php
+
 namespace WDIP\Plugin;
 
 
-class ObjectData implements \Iterator, \ArrayAccess {
-    private $data = [];
+class ObjectData extends \ArrayObject {
+    protected $data = [];
+
+    public function __isset($name) {
+        return array_key_exists($this->normaliseName($name), $this->data);
+    }
+
+    public function __set($name, $value) {
+        $this->data[$this->normaliseName($name)] = is_numeric($value) ? floatval($value) : $value;
+    }
+
+    public function __get($name) {
+        return $this->__isset($name) ? $this->data[$this->normaliseName($name)] : null;
+    }
+
+    public function __unset($name) {
+        unset($this->data[$this->normaliseName($name)]);
+    }
 
     public function offsetExists($offset) {
         return $this->__isset($offset);
@@ -21,66 +38,33 @@ class ObjectData implements \Iterator, \ArrayAccess {
         $this->__unset($offset);
     }
 
-    public function current() {
-        return current($this->data);
-    }
-
-    public function next() {
-        next($this->data);
-    }
-
-    public function key() {
-        return key($this->data);
-    }
-
-    public function valid() {
-        return $this->offsetExists($this->key());
-    }
-
-    public function rewind() {
-        reset($this->data);
-    }
-
-    public function __construct($data = []) {
-        $this->fromObjectArray($data);
+    public function __construct(array $data = []) {
+        $this->fromArray($data);
     }
 
     public function has($name) {
-        return $this->__isset($name);
+        return $this->offsetExists($name);
     }
 
     public function toJSON() {
         return json_encode($this->data);
     }
 
-    public function __isset($name) {
-        return isset($this->data[$this->normaliseName($name)]);
-    }
-
-    public function __set($name, $value) {
-        $this->data[$this->normaliseName($name)] = is_numeric($value) ? floatval($value) : $value;
-    }
-
-    public function __get($name) {
-        return $this->__isset($name) ? $this->data[$this->normaliseName($name)] : null;
-    }
-
-    public function __unset($name) {
-        unset($this->data[$this->normaliseName($name)]);
-    }
-
-    public function fromObjectArray($data) {
+    public function fromArray($data) {
         foreach ($data as $name => $value) {
-            $this[$this->normaliseName($name)] = $value;
+            $this[$name] = $value;
         }
     }
-    
-    private function normaliseName($name){
-        $names = explode('-', $name);
-        $name = strtolower(array_shift($names));
-        foreach ($names as $part){
-            $name .= ucfirst($part);
+
+    private function normaliseName($name) {
+        if (strpos($name, '-') !== false) {
+            $names = explode('-', $name);
+            $name = strtolower(array_shift($names));
+            foreach ($names as $part) {
+                $name .= ucfirst($part);
+            }
         }
+
         return $name;
     }
 }

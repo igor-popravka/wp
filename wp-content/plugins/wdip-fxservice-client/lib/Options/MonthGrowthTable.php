@@ -6,7 +6,7 @@ use WDIP\Plugin\Services;
 
 /**
  * @property $tableData
- * @property $defaultcells
+ * @property $defaultCells
  * @property $serviceClient
  */
 class MonthGrowthTable extends AbstractOptions {
@@ -118,8 +118,8 @@ class MonthGrowthTable extends AbstractOptions {
     }
 
     private function generateDefaultCells() {
-        if (!empty($this->defaultcells)) {
-            $default = explode(',', $this->defaultcells);
+        if (!empty($this->defaultCells)) {
+            $default = explode(',', $this->defaultCells);
             $formatted = [];
             foreach ($default as $cell) {
                 if (preg_match('/^\s*([a-z]{3})\s*:\s*(\d{4})\s*=\s*([0-9.]+)\s*$/i', $cell, $match)) {
@@ -129,13 +129,13 @@ class MonthGrowthTable extends AbstractOptions {
                     $formatted[$match[2]][strtoupper($match[1])] = $match[3];
                 }
             }
-            $this->defaultcells = $formatted;
+            $this->defaultCells = $formatted;
         }
     }
 
     private function mergeDefaultCells($year, array $months) {
-        if (!empty($this->defaultcells)) {
-            foreach ($this->defaultcells as $y => $m) {
+        if (!empty($this->defaultCells)) {
+            foreach ($this->defaultCells as $y => $m) {
                 if ($year == $y) {
                     foreach ($m as $n => $v) {
                         if (isset($months[$n]) && $months[$n] == self::NOT_AVAILABLE) {

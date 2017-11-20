@@ -6,12 +6,12 @@ use WDIP\Plugin\Services;
 
 /**
  * @property $series
- * @property $monthtickinterval
+ * @property $monthTickInterval
  * @property $serviceClient
  */
 class TotalGrowth extends AbstractOptions {
     protected function generate(array $data) {
-        $this->monthtickinterval = 1000 * 3600 * 24 * 30;
+        $this->monthTickInterval = 1000 * 3600 * 24 * 30;
 
         $data = array_map(function($val){
             return [

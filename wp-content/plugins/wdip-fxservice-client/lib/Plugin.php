@@ -152,10 +152,10 @@ class Plugin {
         if ($request->validate(['accountId', 'start', 'amount', 'fee'])) {
             $option = new CalculatorForm($request);
             $response = $option->calculate();
-            
+
             wp_send_json_success($response);
         } else {
-            wp_send_json_success( [
+            wp_send_json_success([
                 'total_amount' => '$0.00',
                 'fee_amount' => '$0.00',
                 'gain_amount' => '$0.00',
@@ -232,23 +232,23 @@ class Plugin {
 
         switch ($attributes->get('chart-type')->getValue()) {
             case ShortCodeAttributes::CHART_TYPE_MONTH_GROWTH:
-                $options = new MonthGrowth(new ObjectData($attributes->toArray()));
+                $options = new MonthGrowth($attributes->toArray());
                 $content = Services::viewer()->render('fxservice-chart', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_TOTAL_GROWTH:
-                $options = new TotalGrowth(new ObjectData($attributes->toArray()));
+                $options = new TotalGrowth($attributes->toArray());
                 $content = Services::viewer()->render('fxservice-chart', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_MONTHLY_GAIN_LOSS:
-                $options = new MonthlyGainLoss(new ObjectData($attributes->toArray()));
+                $options = new MonthlyGainLoss($attributes->toArray());
                 $content = Services::viewer()->render('fxservice-chart', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_CALCULATOR_FORM:
-                $options = new CalculatorForm(new ObjectData($attributes->toArray()));
+                $options = new CalculatorForm($attributes->toArray());
                 $content = Services::viewer()->render('calculator-form', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_MONTH_GROWTH_TABLE:
-                $options = new MonthGrowthTable(new ObjectData($attributes->toArray()));
+                $options = new MonthGrowthTable($attributes->toArray());
                 $content = Viewer::instance()->render('month-growth-table', $options);
         }
 

@@ -1,7 +1,7 @@
 (function ($) {
     var plugin = {
         init: function (options) {
-            switch (options.charttype) {
+            switch (options.chartType) {
                 case 'month-growth':
                 case 'monthly-gain-loss':
                 case 'ch_monthlyreturn':
@@ -129,7 +129,7 @@
         },
 
         getChartOptions: function (options) {
-            switch (options.charttype) {
+            switch (options.chartType) {
                 case 'month-growth':
                 case 'monthly-gain-loss':
                 case 'ch_monthlyreturn':
@@ -148,11 +148,11 @@
                     enabled: false
                 },
                 chart: {
-                    backgroundColor: options.backgroundcolor || null,
+                    backgroundColor: options.backgroundColor || null,
                     type: 'column',
                     zoomType: 'x',
-                    height: options.chartheight || null,
-                    width: options.chartwidth || null,
+                    height: options.chartHeight || null,
+                    width: options.chartWidth || null,
                     spacingBottom: 25
                 },
                 title: {
@@ -166,12 +166,12 @@
                 xAxis: {
                     tickmarkPlacement: 'on',
                     gridLineWidth: 1,
-                    gridLineColor: options.gridlinecolor || '#7A7F87',
+                    gridLineColor: options.gridLineColor || '#7A7F87',
                     gridLineDashStyle: 'dot',
                     categories: options.categories
                 },
                 yAxis: {
-                    gridLineColor: options.gridlinecolor || '#7A7F87',
+                    gridLineColor: options.gridLineColor || '#7A7F87',
                     title: {text: ''},
                     labels: {
                         formatter: function () {
@@ -205,11 +205,11 @@
                     enabled: false
                 },
                 chart: {
-                    backgroundColor: options.backgroundcolor || null,
+                    backgroundColor: options.backgroundColor || null,
                     type: 'areaspline',
                     zoomType: 'x',
-                    height: options.chartheight || null,
-                    width: options.chartwidth || null,
+                    height: options.chartHeight || null,
+                    width: options.chartWidth || null,
                     spacingBottom: 25
                 },
                 title: {
@@ -226,10 +226,10 @@
                 xAxis: {
                     tickmarkPlacement: 'on',
                     gridLineWidth: 1,
-                    gridLineColor: options.gridlinecolor || '#7A7F87',
+                    gridLineColor: options.gridLineColor || '#7A7F87',
                     gridLineDashStyle: 'dot',
                     type: 'datetime',
-                    tickInterval: options.monthtickinterval,
+                    tickInterval: options.monthTickInterval,
                     labels: {
                         formatter: function () {
                             var dt = new Date(this.value),
@@ -239,7 +239,7 @@
                     }
                 },
                 yAxis: {
-                    gridLineColor: options.gridlinecolor || '#7A7F87',
+                    gridLineColor: options.gridLineColor || '#7A7F87',
                     title: {
                         text: ''
 

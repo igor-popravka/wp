@@ -54,6 +54,6 @@ class System {
     }
     
     public function getViewPath($file){
-        return $this->getFullPath("view/{$file}.php");
+        return $this->getFullPath("views/{$file}.php");
     }
 }

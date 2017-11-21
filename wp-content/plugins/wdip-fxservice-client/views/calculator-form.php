@@ -9,15 +9,15 @@ $options = $this->getOptions();
     <div class="wdip-result">
         <div>
             <label>Total amount:</label>
-            <span class="wdip-field-total" name="wdip_total_amount">$0.00</span>
+            <span class="wdip-field total-amount">$0.00</span>
         </div>
         <div>
             <label>Gain amount:</label>
-            <span class="wdip-field-gain" name="wdip_gain_amount">$0.00</span>
+            <span class="wdip-field gain-amount">$0.00</span>
         </div>
         <div>
             <label>Fee amount:</label>
-            <span class="wdip-field-fee" name="wdip_fee_amount">$0.00</span>
+            <span class="wdip-field fee-amount">$0.00</span>
         </div>
     </div>
     <div class="wdip-menu">
@@ -47,12 +47,15 @@ $options = $this->getOptions();
 </div>
 <script>
     (function ($) {
-        var options = {
-            fee: JSON.parse('<?= json_encode($options->fee); ?>'),
-            accID: JSON.parse('<?= json_encode($options->accountId); ?>'),
-            url: '<?= $options->adminUrl; ?>',
+        /*var options = {
+            fee: JSON.parse('<= json_encode($options->fee); ?>'),
+            accID: JSON.parse('<= json_encode($options->accountId); ?>'),
+            url: '<= $options->adminUrl; ?>',
+            serviceClient: '<= $options->serviceClient; ?>',
             chart_options: JSON.parse('[]')
-        };
+        };*/
+
+        var options = JSON.parse('<?= $options->toJSON(); ?>');
 
         $('#<?= $options->uid ?>').FXCalculator(options);
     })(jQuery);

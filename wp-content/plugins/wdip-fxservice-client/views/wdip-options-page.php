@@ -19,9 +19,9 @@ use WDIP\Plugin\Plugin;
     <form action="options.php" method="post">
         <?php
         // output security Servicesfields
-        \settings_fields(Plugin::SETTINGS_OPTIONS_GROUP);
+        \settings_fields(Plugin::getOptionGroup());
         // output setting sections and their fields
-        \do_settings_sections(Plugin::SETTINGS_OPTIONS_PAGE);
+        \do_settings_sections(Plugin::getOptionPage());
         // output save settings button
         \submit_button('Save Settings');
         ?>

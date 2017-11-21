@@ -226,7 +226,7 @@ class Model {
                 Services::cache()->set(Cache::CACHE_KEY_MYFXBOOK_SESSION, $session);
             }
         } else if (!($session = Services::cache()->get(Cache::CACHE_KEY_MYFXBOOK_SESSION, null))) {
-            $options = get_option(Services::config()->PLUGIN_SETTINGS['options_name']);
+            $options = get_option(Plugin::getOptionName());
             $login = isset($options['login_field']) ? $options['login_field'] : null;
             $password = isset($options['password_field']) ? $options['password_field'] : null;
 

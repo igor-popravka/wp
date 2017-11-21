@@ -2,8 +2,8 @@
 namespace WDIP\Plugin;
 
 /**
- * @property array OPTIONS_PAGE
- * @property array PLUGIN_SETTINGS
+ * @property int version
+ * @property array SETTINGS
  * @property array FXSERVICE_API
  */
 class Config extends ObjectData {

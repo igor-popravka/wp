@@ -67,4 +67,8 @@ class ObjectData extends \ArrayObject {
 
         return $name;
     }
+
+    public function getSource(){
+        return $this->data;
+    }
 }

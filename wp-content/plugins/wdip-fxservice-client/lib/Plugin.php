@@ -17,17 +17,28 @@ use WDIP\Plugin\Options\TotalGrowth;
  * Time: 14:32
  */
 class Plugin {
-    const SETTINGS_OPTIONS_PAGE = 'fxservice-client-settings';
-    const SETTINGS_OPTIONS_GROUP = 'fxservice-client-myfxbook-group';
-    const SETTINGS_OPTIONS_NAME = 'fxservice-client-myfxbook-options';
-    const SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION = 'fxservice-client-myfxbook-auth-section';
-
     const SHORT_CODE_MYFXBOOK = 'myfxbook-client';
     const SHORT_CODE_FXBLUE = 'fxblue-client';
 
     private static $instance;
 
     private function __construct() {
+    }
+
+    public static function getOptionPage() {
+        return self::getHash(Services::config()->SETTINGS['page_fxservice']);
+    }
+
+    public static function getOptionGroup() {
+        return self::getHash(Services::config()->SETTINGS['group_myfxbook']);
+    }
+
+    public static function getOptionName() {
+        return self::getHash(Services::config()->SETTINGS['option_name_myfxbook']);
+    }
+
+    public static function getHash($value){
+        return md5($value . '-' . Services::config()->version);
     }
 
     public static function instance() {
@@ -57,10 +68,10 @@ class Plugin {
 
     public function initAdminMenu() {
         add_options_page(
-            __('FX-Service Client (MyFXBook) Settings', self::SETTINGS_OPTIONS_PAGE),
+            __('FX-Service Client (MyFXBook) Settings', self::getOptionPage()),
             'FX-Service Client',
             8,
-            self::SETTINGS_OPTIONS_PAGE,
+            self::getOptionPage(),
             $this->getCallback('renderOptionsPage')
         );
     }
@@ -74,49 +85,49 @@ class Plugin {
     public function initPluginSettings() {
         /** registration setting */
         register_setting(
-            self::SETTINGS_OPTIONS_GROUP,
-            self::SETTINGS_OPTIONS_NAME,
+            self::getOptionGroup(),
+            self::getOptionName(),
             $this->getCallback('onBeforeSaveSettings')
         );
 
         /** registration section */
-        //$section = Services::config()->PLUGIN_SETTINGS['section_code'];
+        $section = self::getHash(Services::config()->SETTINGS['option_myfxbook_auth_section']);
         //$page = Services::config()->OPTIONS_PAGE['menu_slug'];
 
         add_settings_section(
-            self::SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION,
-            __('Account Registration Data', self::SETTINGS_OPTIONS_PAGE),
+            $section,
+            __('Account Registration Data', self::getOptionPage()),
             $this->getCallback('renderSectionNotify'),
-            self::SETTINGS_OPTIONS_PAGE
+            self::getOptionPage()
         );
 
         /** registration fields */
         add_settings_field(
             'login_field',
-            __('Login', self::SETTINGS_OPTIONS_PAGE),
+            __('Login', self::getOptionPage()),
             $this->getCallback('renderSectionField'),
-            self::SETTINGS_OPTIONS_PAGE,
-            self::SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION,
+            self::getOptionPage(),
+            $section,
             [
                 'label_for' => 'login_field',
                 'tag' => 'input',
                 'type' => 'text',
                 'description' => 'Enter your a login. It will be used only to authorization in API',
-                'options_name' => self::SETTINGS_OPTIONS_NAME
+                'options_name' => self::getOptionName()
             ]
         );
         add_settings_field(
             'password_field',
-            __('Password', self::SETTINGS_OPTIONS_PAGE),
+            __('Password', self::getOptionPage()),
             $this->getCallback('renderSectionField'),
-            self::SETTINGS_OPTIONS_PAGE,
-            self::SETTINGS_OPTIONS_MYFXBOOK_AUTH_SECTION,
+            self::getOptionPage(),
+            $section,
             [
                 'label_for' => 'password_field',
                 'tag' => 'input',
                 'type' => 'password',
                 'description' => 'Enter your a password. It will be used only to authorization in API',
-                'options_name' => self::SETTINGS_OPTIONS_NAME
+                'options_name' => self::getOptionName()
             ]
         );
     }
@@ -126,9 +137,9 @@ class Plugin {
 
         if (empty($session)) {
             add_settings_error(
-                self::SETTINGS_OPTIONS_NAME,
+                self::getOptionName(),
                 'myfxbook-api-session-empty',
-                __(Services::config()->PLUGIN_SETTINGS['error']['session_empty']['message'], Services::config()->OPTIONS_PAGE['menu_slug'])
+                __(Services::config()->SETTINGS['error_empty_session'], self::getOptionPage())
             );
         }
 
@@ -153,12 +164,12 @@ class Plugin {
     public function ajaxCalculateGrowthData() {
         $request = new Request();
         if ($request->validate(['accountId', 'start', 'amount', 'fee'])) {
-            $option = new CalculatorForm($request);
-            $response = $option->calculate();
+            $option = new CalculatorForm($request->getSource());
+            $response = $option->getSource();
 
             wp_send_json_success($response);
         } else {
-            wp_send_json_success([
+            wp_send_json_error([
                 'total_amount' => '$0.00',
                 'fee_amount' => '$0.00',
                 'gain_amount' => '$0.00',
@@ -192,8 +203,8 @@ class Plugin {
     }
 
     public function onDeactivationSettings() {
-        unregister_setting(self::SETTINGS_OPTIONS_GROUP, self::SETTINGS_OPTIONS_NAME);
-        delete_option(self::SETTINGS_OPTIONS_NAME);
+        unregister_setting(self::getOptionGroup(), self::getOptionName());
+        delete_option(self::getOptionName());
     }
 
     /**

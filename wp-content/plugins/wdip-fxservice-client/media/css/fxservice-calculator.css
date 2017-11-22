@@ -1,0 +1,55 @@
+.fxservice-calculator {
+    padding: 10px;
+    width: 100%;
+    background: none;
+    border: solid 1px;
+}
+
+.fxservice-calculator .data-panel {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: solid 1px;
+}
+
+.fxservice-calculator .data-panel .control-grope {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.fxservice-calculator .data-panel .button-grope {
+    display: inline-block;
+    float: right;
+}
+
+.fxservice-calculator .chart-panel {
+    height: 300px;
+    background: none;
+}
+
+.fxservice-calculator .response-panel {
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: solid 1px;
+}
+
+.fxservice-calculator .response-panel .control-grope {
+    display: block;
+}
+
+.fxservice-calculator .response-panel .control-grope .control-item {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.fxservice-calculator .response-panel .control-grope .control-item.role-label {
+    width: 150px;
+    font-weight: bold;
+}
+
+.fxservice-calculator .response-panel .control-grope .control-item.role-text.down-amount {
+    color: #a94442;
+}
+
+.fxservice-calculator .response-panel .control-grope .control-item.role-text.up-amount {
+    color: darkgreen;
+}

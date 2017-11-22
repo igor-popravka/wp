@@ -196,9 +196,17 @@ class Plugin {
             'jquery-ui-button',
             'highcharts'
         ], $this->getVersion());
+        wp_enqueue_script('fxservice-calculator-plugin', Services::system()->getJsURL('fxservice.calculator.plugin'), [
+            'jquery',
+            'jquery-ui-dialog',
+            'jquery-ui-datepicker',
+            'jquery-ui-button',
+            'highcharts'
+        ], $this->getVersion());
         wp_enqueue_style('jquery-ui-slider-css', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
         wp_enqueue_style('wdip-myfxbook-css', Services::system()->getCssURL('wdip-fxservice-client'), null, $this->getVersion());
         wp_enqueue_style('wdip-calculator-css', Services::system()->getCssURL('wdip-calculator'), null, $this->getVersion());
+        wp_enqueue_style('fxservice-calculator-css', Services::system()->getCssURL('fxservice-calculator'), null, $this->getVersion());
     }
 
     public function onDeactivationSettings() {
@@ -258,7 +266,7 @@ class Plugin {
                 break;
             case ShortCodeAttributes::CHART_TYPE_CALCULATOR_FORM:
                 $options = new CalculatorForm($attributes->toArray());
-                $content = Services::viewer()->render('calculator-form', $options);
+                $content = Services::viewer()->render('hline-calculator-form', $options);
                 break;
             case ShortCodeAttributes::CHART_TYPE_MONTH_GROWTH_TABLE:
                 $options = new MonthGrowthTable($attributes->toArray());

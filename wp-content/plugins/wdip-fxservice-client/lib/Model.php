@@ -163,7 +163,7 @@ class Model {
                 Services::config()->FXSERVICE_API['fxblue_url'],
                 'fxbluechart.aspx',
                 [
-                    'c' => 'ch_cumulativereturn',
+                    'c' => 'ch_monthlyreturn',
                     'id' => $account_id
                 ]
             );

@@ -46,15 +46,15 @@
     padding-left: 20px;
 }
 
-.wdip-calc-wrapper .wdip-result span.wdip-field.total-amount {
-    color: #2d8ac7;
+.wdip-calc-wrapper .wdip-result span.wdip-field {
+    color: #000000;
 }
 
-.wdip-calc-wrapper .wdip-result span.wdip-field.gain-amount {
-    color: #7CA821;
+.wdip-calc-wrapper .wdip-result span.wdip-field.up-amount {
+    color: darkgreen;
 }
 
-.wdip-calc-wrapper .wdip-result span.wdip-field.fee-amount {
+.wdip-calc-wrapper .wdip-result span.wdip-field.down-amount {
     color: #a94442;
 }
 

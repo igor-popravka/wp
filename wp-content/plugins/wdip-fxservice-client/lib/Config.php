@@ -5,6 +5,7 @@ namespace WDIP\Plugin;
  * @property int version
  * @property array SETTINGS
  * @property array FXSERVICE_API
+ * @property array CALCULATOR_CHART_OPTIONS
  */
 class Config extends ObjectData {
     private static $instance;

@@ -6,29 +6,49 @@ use WDIP\Plugin\Plugin;
 use WDIP\Plugin\Services;
 
 /**
- * @property $categories
- * @property $series
  * @property $adminUrl
  * @property $serviceClient
  * @property $accountId
  * @property $amount
  * @property $fee
  * @property $start
- * @property $total_amount
- * @property $fee_amount
- * @property $gain_amount
+ * @property $totalAmount
+ * @property $feeAmount
+ * @property $gainLosAmount
+ * @property $chartOptions
  */
 class CalculatorForm extends AbstractOptions {
     protected function generate(array $data) {
         $this->adminUrl = admin_url('admin-ajax.php');
 
         $data = $this->calculate($data);
+        
+        $chart_options = Services::config()->CALCULATOR_CHART_OPTIONS;
+        $chart_options['xAxis']['categories'] = $data['categories'];
 
-        $this->total_amount = sprintf('$%s', number_format($data['total_amount'], 2));
-        $this->gain_amount = sprintf('$%s', number_format($data['gain_amount'], 2));
-        $this->fee_amount = sprintf('$%s', number_format($data['fee_amount'], 2));
-        $this->categories = $data['categories'];
-        $this->series = $data['series'];
+        $series = json_decode('[' . implode(',', (array)$chart_options['series']) . ']', true);
+        $series[0]['data'] = $data['total_series_data'];
+        $series[1]['data'] = $data['gain_los_series_data'];
+        $series[2]['data'] = $data['fee_series_data'];
+        $chart_options['series'] = $series;
+
+        if(!empty($this->title)){
+            $chart_options['title']['text'] = $this->title;
+        }
+
+        if(!empty($this->backgroundColor)){
+            $chart_options['chart']['backgroundColor'] = $this->backgroundColor;
+        }
+
+        if(!empty($this->gridLineColor)){
+            $chart_options['yAxis']['gridLineColor'] = $this->gridLineColor;
+        }
+
+        $this->chartOptions = $chart_options;
+
+        $this->totalAmount = $data['total_amount'];
+        $this->gainLosAmount = $data['gain_los_amount'];
+        $this->feeAmount = $data['fee_amount'];
     }
 
     protected function getData() {
@@ -56,42 +76,33 @@ class CalculatorForm extends AbstractOptions {
 
                 return $data;
             } else if ($this->serviceClient == Plugin::SHORT_CODE_FXBLUE) {
-                return Services::model()->getFXBlueGrowthData($this->accountId);
+                foreach ($this->accountId as $id) {
+                    $result = array_merge($result, Services::model()->getFXBlueMonthlyGainLossData($id));
+                }
+
+                $data = [];
+                foreach ($result as $val) {
+                    $date = \DateTime::createFromFormat('m/d/Y', $val[0]);
+                    $data[$date->format('M Y')] = [$date->getTimestamp(), floatval($val[1])];
+                };
+
+                return $data;
             }
         }
 
         return [];
     }
 
-    protected function getDefaultData() {
-        return [
-            'total_amount' => 0,
-            'fee_amount' => 0,
-            'gain_amount' => 0,
-            'categories' => [],
-            'series' => [
-                [
-                    "name" => "Total",
-                    "data" => [],
-                    "color" => "#2D8AC7"
-                ],
-                [
-                    "name" => "Gain",
-                    "data" => [],
-                    "color" => "#7CA821"
-                ],
-                [
-                    "name" => "Fee",
-                    "data" => [],
-                    "color" => "#A94442"
-                ]
-            ]
-        ];
-    }
-
-
     protected function calculate(array $data) {
-        $result = $this->getDefaultData();
+        $result = [
+            'total_amount' => 0,
+            'gain_los_amount' => 0,
+            'fee_amount' => 0,
+            'categories' => [],
+            'total_series_data' => [],
+            'gain_los_series_data' => [],
+            'fee_series_data' => []
+        ];
 
         if (!empty($data)) {
             $start_ts = \DateTime::createFromFormat('Y-m-d', $this->start)->getTimestamp();
@@ -101,21 +112,21 @@ class CalculatorForm extends AbstractOptions {
 
             $result['categories'] = array_keys($data);
 
-            $in_amount = floatval($this->amount);
-            $in_fee = floatval($this->fee);
+            $amount = floatval($this->amount);
+            $fee = floatval($this->fee);
             foreach ($data as $val) {
-                $out_amount = round($in_amount * $val[1], 2);
-                $out_fee = round($out_amount * $in_fee, 2);
-                $out_total_amount = ($in_amount + $out_amount);
+                $gain_amount = round(($amount * ($val[1] / 100)), 2);
+                $fee_amount = round(abs($gain_amount) * $fee, 2);
+                $amount = ($amount + $gain_amount - $fee_amount);
 
-                $result['series'][0]['data'][] = $out_total_amount;
-                $result['series'][1]['data'][] = $out_amount;
-                $result['series'][2]['data'][] = $out_fee;
+                $result['total_series_data'][] = $amount;
+                $result['gain_los_series_data'][] = $gain_amount;
+                $result['fee_series_data'][] = $fee_amount;
             }
 
-            $result['total_amount'] = array_sum($result['series'][0]['data']);
-            $result['gain_amount'] = array_sum($result['series'][1]['data']);
-            $result['fee_amount'] = array_sum($result['series'][2]['data']);
+            $result['total_amount'] = $result['total_series_data'][count($result['total_series_data']) - 1];
+            $result['gain_los_amount'] = array_sum($result['gain_los_series_data']);
+            $result['fee_amount'] = array_sum($result['fee_series_data']);
         }
 
         return $result;

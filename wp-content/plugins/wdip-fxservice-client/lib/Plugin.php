@@ -92,7 +92,6 @@ class Plugin {
 
         /** registration section */
         $section = self::getHash(Services::config()->SETTINGS['option_myfxbook_auth_section']);
-        //$page = Services::config()->OPTIONS_PAGE['menu_slug'];
 
         add_settings_section(
             $section,

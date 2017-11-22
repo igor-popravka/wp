@@ -1,38 +1,4 @@
 (function ($) {
-    function getChartOptions(options) {
-        return {
-            credits: {
-                enabled: false
-            },
-            chart: {
-                backgroundColor: options.backgroundColor,
-                width: 579
-            },
-            title: {
-                text: ""
-            },
-            tooltip: {
-                valuePrefix: "$"
-            },
-            xAxis: {
-                categories: options.categories
-            },
-            yAxis: {
-                title: {
-                    text: ""
-                },
-                labels: {
-                    format: "${value}"
-                },
-                gridLineColor: options.gridLineColor
-            },
-            legend: {
-                enabled: true
-            },
-            series: options.series
-        };
-    }
-
     $.fn.FXCalculator = function (options) {
         var context = this,
             opt = $.extend({
@@ -51,24 +17,14 @@
 
         $('.show-graph', context).button().on('click', function () {
             //if (context.data('chart_series')) {
-                var el = $('<div>').css({display: "none"}).appendTo(context),
-                    chart_options = getChartOptions(opt);
-
-
-                //chart_options.series = context.data('chart_series');
-
-                var chart = Highcharts.chart(el[0], chart_options);
-
-                /*chart.xAxis[0].setCategories(series.categories);
-                chart.series[0].setData(series.total_amount_data);
-                chart.series[1].setData(series.gain_amount_data);
-                chart.series[2].setData(series.fee_amount_data);*/
-
-                el.dialog({
-                    title: "Calculation result into graph",
-                    width: chart_options.chart.width + 50
-                });
-            //}
+            var el = $('<div>').css({display: "none"}).appendTo(context);
+            
+            Highcharts.chart(el[0], opt.chartOptions);
+            
+            el.dialog({
+                title: "Calculation result into graph",
+                width: parseInt(opt.chartOptions.chart.width, 10) + 50
+            });
         });
 
         $('.wdip-menu', context).height(
@@ -95,25 +51,43 @@
 
         $('form', context).submit(function (e) {
             e.preventDefault();
+            $('input[type="submit"]', context).val('Please wait...').attr('disabled', true);
+
             $.post(opt.adminUrl, $.extend({
                 action: 'wdip-calculate-growth-data',
                 accountId: opt.accountId,
                 serviceClient: opt.serviceClient
             }, context.data('post_data')), function (result) {
                 if (result.success) {
-                    $(".total-amount", context).text(result.data.total_amount);
-                    $(".gain-amount", context).text(result.data.gain_amount);
-                    $(".fee-amount", context).text(result.data.fee_amount);
+                    var t_amount = result.data.totalAmount,
+                        t_amount_sign = t_amount >= 0 ? '+' : '',
+                        gl_amount = result.data.gainLosAmount,
+                        gl_amount_sign = gl_amount >= 0 ? '+' : '';
 
-                    opt.categories = result.data.categories;
-                    opt.series = result.data.series;
-                    opt.backgroundColor = result.data.backgroundColor;
-                    opt.gridLineColor = result.data.gridLineColor;
+                    $(".total-amount", context).text(t_amount_sign + t_amount);
+                    $(".gain-loss-amount", context).text(gl_amount_sign + gl_amount);
+                    $(".fee-amount", context).text(result.data.feeAmount);
+
+                    if (t_amount >= 0) {
+                        $(".total-amount", context).removeClass('down-amount').addClass('up-amount');
+                    } else {
+                        $(".total-amount", context).removeClass('up-amount').addClass('down-amount');
+                    }
+
+                    if (gl_amount >= 0) {
+                        $(".gain-loss-amount", context).removeClass('down-amount').addClass('up-amount');
+                    } else {
+                        $(".gain-loss-amount", context).removeClass('up-amount').addClass('down-amount');
+                    }
+
+                    opt.chartOptions = result.data.chartOptions;
+
                 } else {
                     $(".wdip-field", context).each(function () {
-                        $(this).text('$0.00');
+                        $(this).text('0.00');
                     });
                 }
+                $('input[type="submit"]', context).val('Calculate').attr('disabled', null);
             });
             return false;
         });

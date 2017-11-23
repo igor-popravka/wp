@@ -67,11 +67,12 @@ class Attribute {
     }
 
     public function isEmpty() {
+        $value = $this->getValue();
         switch ($this->getType()) {
             case self::TYPE_NUMBER:
-                return is_null($this->getValue());
+                return is_null($value);
             default:
-                return empty($this->getValue());
+                return empty($value);
         }
     }
 

@@ -162,23 +162,13 @@ class Plugin {
 
     public function ajaxCalculateGrowthData() {
         $request = new Request();
-        if ($request->validate(['accountId', 'start', 'amount', 'fee'])) {
+        if ($request->validate(['accountId', 'startDate', 'investAmount', 'interestRate'])) {
+            $request->calculate = true;
             $option = new CalculatorForm($request->getSource());
-            $response = $option->getSource();
-
-            wp_send_json_success($response);
+            
+            wp_send_json_success($option->getSource());
         } else {
-            wp_send_json_error([
-                'total_amount' => '$0.00',
-                'fee_amount' => '$0.00',
-                'gain_amount' => '$0.00',
-                'series' => [
-                    'categories' => [],
-                    'total_amount_data' => [],
-                    'fee_amount_data' => [],
-                    'gain_amount_data' => []
-                ]
-            ]);
+            wp_send_json_error();
         }
     }
 
@@ -189,13 +179,13 @@ class Plugin {
             'jquery-ui-slider',
             'highcharts'
         ], $this->getVersion());
-        wp_enqueue_script('wdip-myfxbook-calculator', Services::system()->getJsURL('wdip-myfxbook.calculator'), [
+        /*wp_enqueue_script('wdip-myfxbook-calculator', Services::system()->getJsURL('wdip-myfxbook.calculator'), [
             'jquery',
             'jquery-ui-dialog',
             'jquery-ui-datepicker',
             'jquery-ui-button',
             'highcharts'
-        ], $this->getVersion());
+        ], $this->getVersion());*/
         wp_enqueue_script('fxservice-calculator-plugin', Services::system()->getJsURL('fxservice.calculator.plugin'), [
             'jquery',
             'jquery-ui-dialog',
@@ -205,7 +195,7 @@ class Plugin {
         ], $this->getVersion());
         wp_enqueue_style('jquery-ui-slider-css', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
         wp_enqueue_style('wdip-myfxbook-css', Services::system()->getCssURL('wdip-fxservice-client'), null, $this->getVersion());
-        wp_enqueue_style('wdip-calculator-css', Services::system()->getCssURL('wdip-calculator'), null, $this->getVersion());
+        //wp_enqueue_style('wdip-calculator-css', Services::system()->getCssURL('wdip-calculator'), null, $this->getVersion());
         wp_enqueue_style('fxservice-calculator-css', Services::system()->getCssURL('fxservice-calculator'), null, $this->getVersion());
     }
 

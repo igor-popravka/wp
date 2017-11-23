@@ -9,13 +9,13 @@ $options = $this->getOptions();
     <div class="data-panel">
         <form>
             <div class="control-grope">
-                <input type="text" name="amount" placeholder="Investment amount">
+                <input type="text" name="investAmount" placeholder="Investment amount">
             </div>
             <div class="control-grope">
-                <input type="text" name="start" placeholder="Start date">
+                <input type="text" name="startDate" placeholder="Start date">
             </div>
             <div class="control-grope">
-                <select name="fee">
+                <select name="interestRate">
                     <option value="0">Interest rate</option>
                 </select>
             </div>
@@ -25,14 +25,14 @@ $options = $this->getOptions();
         </form>
     </div>
 
-    <div class="chart-panel">Result charts</div>
+    <div class="chart-panel">Calculation Result Graph</div>
 
     <div class="response-panel">
-        <div class="control-grope">
+        <div class="control-grope border-right">
             <div class="control-item role-label">Total amount:</div>
             <div class="control-item role-text total-amount">0.00</div>
         </div>
-        <div class="control-grope">
+        <div class="control-grope border-right">
             <div class="control-item role-label">Gain/Loss amount:</div>
             <div class="control-item role-text gain-loss-amount">0.00</div>
         </div>

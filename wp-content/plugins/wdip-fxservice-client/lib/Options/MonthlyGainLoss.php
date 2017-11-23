@@ -45,16 +45,33 @@ class MonthlyGainLoss extends AbstractOptions {
     }
 
     protected function getData() {
-        switch ($this->serviceClient){
+        $result = [];
+
+        switch ($this->serviceClient) {
             case Plugin::SHORT_CODE_MYFXBOOK:
-                $result = [];
-                foreach ($this->accountId as $id) {
-                    $result = array_merge($result, Services::model()->getMyFXBookMonthlyGainLossData($id));
+                try {
+                    foreach ($this->accountId as $id) {
+                        $result = array_merge($result, Services::model()->getMyFXBookMonthlyGainLossData($id));
+                    }
+                } catch (\Exception $e) {
                 }
+
                 return $result;
             case Plugin::SHORT_CODE_FXBLUE:
-                return Services::model()->getFXBlueMonthlyGainLossData($this->accountId);
+                try {
+                    foreach ($this->accountId as $id) {
+                        $result = Services::model()->getFXBlueMonthlyGainLossData($id);
+                    }
+
+                    $result = array_map(function ($val) {
+                        $date = \DateTime::createFromFormat("m/d/Y", $val[0])->format('M Y');
+                        return [[$date], [$val[1]]];
+                    }, $result);
+                } catch (\Exception $e) {
+                }
+                
+                return $result;
         }
-        return [];
+        return $result;
     }
 }

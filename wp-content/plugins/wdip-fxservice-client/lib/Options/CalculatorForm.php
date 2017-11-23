@@ -8,13 +8,19 @@ use WDIP\Plugin\Services;
 /**
  * @property $adminUrl
  * @property $serviceClient
+ * @property $calculate
+ *
  * @property $accountId
- * @property $amount
- * @property $fee
- * @property $start
+ * @property $feeList
+ *
+ * @property $investAmount
+ * @property $interestRate
+ * @property $startDate
+ *
  * @property $totalAmount
  * @property $feeAmount
  * @property $gainLosAmount
+ *
  * @property $chartOptions
  */
 class CalculatorForm extends AbstractOptions {
@@ -22,7 +28,7 @@ class CalculatorForm extends AbstractOptions {
         $this->adminUrl = admin_url('admin-ajax.php');
 
         $data = $this->calculate($data);
-        
+
         $chart_options = Services::config()->CALCULATOR_CHART_OPTIONS;
         $chart_options['xAxis']['categories'] = $data['categories'];
 
@@ -32,15 +38,15 @@ class CalculatorForm extends AbstractOptions {
         $series[2]['data'] = $data['fee_series_data'];
         $chart_options['series'] = $series;
 
-        if(!empty($this->title)){
+        if (!empty($this->title)) {
             $chart_options['title']['text'] = $this->title;
         }
 
-        if(!empty($this->backgroundColor)){
+        if (!empty($this->backgroundColor)) {
             $chart_options['chart']['backgroundColor'] = $this->backgroundColor;
         }
 
-        if(!empty($this->gridLineColor)){
+        if (!empty($this->gridLineColor)) {
             $chart_options['yAxis']['gridLineColor'] = $this->gridLineColor;
         }
 
@@ -52,11 +58,14 @@ class CalculatorForm extends AbstractOptions {
     }
 
     protected function getData() {
-        if (!empty($this->amount) && !empty($this->start) && !empty($this->fee)) {
+        if (isset($this->calculate) && $this->calculate) {
             $result = [];
             if ($this->serviceClient == Plugin::SHORT_CODE_MYFXBOOK) {
-                foreach ($this->accountId as $id) {
-                    $result = array_merge($result, Services::model()->getMyFXBookMonthlyGainLossData($id));
+                try {
+                    foreach ($this->accountId as $id) {
+                        $result = array_merge($result, Services::model()->getMyFXBookMonthlyGainLossData($id));
+                    }
+                } catch (\Exception $e) {
                 }
 
                 $data = [];
@@ -76,8 +85,11 @@ class CalculatorForm extends AbstractOptions {
 
                 return $data;
             } else if ($this->serviceClient == Plugin::SHORT_CODE_FXBLUE) {
-                foreach ($this->accountId as $id) {
-                    $result = array_merge($result, Services::model()->getFXBlueMonthlyGainLossData($id));
+                try {
+                    foreach ($this->accountId as $id) {
+                        $result = array_merge($result, Services::model()->getFXBlueMonthlyGainLossData($id));
+                    }
+                } catch (\Exception $e) {
                 }
 
                 $data = [];
@@ -105,15 +117,15 @@ class CalculatorForm extends AbstractOptions {
         ];
 
         if (!empty($data)) {
-            $start_ts = \DateTime::createFromFormat('Y-m-d', $this->start)->getTimestamp();
+            $start_ts = \DateTime::createFromFormat('Y-m-d', $this->startDate)->getTimestamp();
             $data = array_filter($data, function ($val) use ($start_ts) {
                 return $val[0] >= $start_ts;
             });
 
             $result['categories'] = array_keys($data);
 
-            $amount = floatval($this->amount);
-            $fee = floatval($this->fee);
+            $amount = floatval($this->investAmount);
+            $fee = floatval($this->interestRate);
             foreach ($data as $val) {
                 $gain_amount = round(($amount * ($val[1] / 100)), 2);
                 $fee_amount = round(abs($gain_amount) * $fee, 2);

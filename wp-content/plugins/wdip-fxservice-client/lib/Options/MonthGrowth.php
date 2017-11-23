@@ -48,17 +48,25 @@ class MonthGrowth extends AbstractOptions {
     }
 
     protected function getData() {
-        switch ($this->serviceClient){
+        switch ($this->serviceClient) {
             case Plugin::SHORT_CODE_MYFXBOOK:
                 $basic = 0;
                 $result = [];
-                foreach ($this->accountId as $id) {
-                    $result = array_merge($result, Services::model()->getMyFXBookGrowthData($id, $basic));
-                    $basic = $result[count($result) - 1][1];
+                try {
+                    foreach ($this->accountId as $id) {
+                        $result = array_merge($result, Services::model()->getMyFXBookGrowthData($id, $basic));
+                        $basic = $result[count($result) - 1][1];
+                    }
+                } catch (\Exception $e) {
                 }
                 return $result;
             case Plugin::SHORT_CODE_FXBLUE:
-                return Services::model()->getFXBlueGrowthData($this->accountId);
+                try {
+                    foreach ($this->accountId as $id) {
+                        return Services::model()->getFXBlueGrowthData($id);
+                    }
+                } catch (\Exception $e) {
+                }
         }
         return [];
     }

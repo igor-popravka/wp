@@ -1,8 +1,8 @@
 {
     "name": "wdip/myfxbook",
-    "version": "2.1.3",
+    "version": "2.2.3",
     "type": "library",
-    "description": "MyFxBook WordPress plugin",
+    "description": "FX-Service WordPress plugin",
     "time": "2017-09-30",
     "license": "MIT",
     "authors": [

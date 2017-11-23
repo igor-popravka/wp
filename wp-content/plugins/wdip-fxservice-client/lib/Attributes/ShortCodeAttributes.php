@@ -16,7 +16,7 @@ class ShortCodeAttributes extends AbstractCollectionAttributes {
             'background-color' => ['required' => false, 'default' => '#FFFFFF', 'type' => Attribute::TYPE_STRING],
             'grid-line-color' => ['required' => false, 'default' => '#465D86', 'type' => Attribute::TYPE_STRING],
             'title' => ['required' => false, 'default' => '', 'type' => Attribute::TYPE_STRING],
-            'fee' => ['required' => false, 'default' => '', 'type' => Attribute::TYPE_LIST],
+            'fee-list' => ['required' => false, 'default' => '', 'type' => Attribute::TYPE_LIST],
         ];
     }
 }

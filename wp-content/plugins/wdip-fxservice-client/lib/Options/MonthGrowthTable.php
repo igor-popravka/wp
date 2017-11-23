@@ -59,16 +59,29 @@ class MonthGrowthTable extends AbstractOptions {
             'TOTAL_COMPOUNDED' => 0
         ];
 
-        switch ($this->serviceClient){
+        switch ($this->serviceClient) {
             case Plugin::SHORT_CODE_MYFXBOOK:
-                foreach ($this->accountId as $id) {
-                    $result['DATA'] = array_merge($result['DATA'], Services::model()->getMyFXBookMonthlyGainLossData($id));
-                    $result['TOTAL_COMPOUNDED'] += Services::model()->getMyFXBookTotalAccountGain($id);
+                try {
+                    foreach ($this->accountId as $id) {
+                        $result['DATA'] = array_merge($result['DATA'], Services::model()->getMyFXBookMonthlyGainLossData($id));
+                        $result['TOTAL_COMPOUNDED'] += Services::model()->getMyFXBookTotalAccountGain($id);
+                    }
+                } catch (\Exception $e) {
                 }
                 return $result;
             case Plugin::SHORT_CODE_FXBLUE:
-                $result['DATA'] = Services::model()->getFXBlueMonthlyGainLossData($this->accountId);
-                $result['TOTAL_COMPOUNDED'] = 0;
+                try {
+                    foreach ($this->accountId as $id) {
+                        $result['DATA'] = Services::model()->getFXBlueMonthlyGainLossData($id);
+                        $result['TOTAL_COMPOUNDED'] = Services::model()->getFXBlueAccountData($id)->totalReturn;
+                    }
+
+                    $result['DATA'] = array_map(function ($val) {
+                        $date = \DateTime::createFromFormat("m/d/Y", $val[0])->format('M Y');
+                        return [[$date], [$val[1]]];
+                    }, $result['DATA']);
+                } catch (\Exception $e) {
+                }
                 return $result;
         }
         return $result;

@@ -1,7 +1,7 @@
 .fxservice-calculator {
     padding: 10px;
     width: 100%;
-    background: none;
+    background: #fff;
     border: solid 1px;
 }
 
@@ -16,14 +16,47 @@
     margin-right: 5px;
 }
 
+.fxservice-calculator .data-panel .control-grope input {
+    border: 1px solid #ccc;
+    color: #666;
+    padding: 3px 6px;
+    width: 140px;
+    height: 28px;
+    margin: 0;
+    font-size: 12px;
+}
+
+.fxservice-calculator .data-panel .control-grope select {
+    border: 1px solid #ccc;
+    color: #666;
+    padding: 3px 6px;
+    width: 140px;
+    height: 28px;
+    margin: 0;
+    font-size: 12px;
+}
+
 .fxservice-calculator .data-panel .button-grope {
     display: inline-block;
     float: right;
 }
 
+.fxservice-calculator .data-panel .valid-error {
+    border-color: red!important;
+}
+
+.fxservice-calculator .data-panel .button-grope input {
+    height: 28px;
+    padding: 3px 10px;
+    margin: 0;
+}
+
 .fxservice-calculator .chart-panel {
-    height: 300px;
+    min-height: 290px;
     background: none;
+    color: #ccc;
+    font-weight: bold;
+    text-align: center;
 }
 
 .fxservice-calculator .response-panel {
@@ -33,17 +66,22 @@
 }
 
 .fxservice-calculator .response-panel .control-grope {
-    display: block;
+    display: inline-block;
+    margin-right: 10px;
+    padding-right: 10px;
+}
+
+.fxservice-calculator .response-panel .border-right {
+    border-right: 1px solid #ccc;
 }
 
 .fxservice-calculator .response-panel .control-grope .control-item {
     display: inline-block;
-    margin-bottom: 5px;
 }
 
 .fxservice-calculator .response-panel .control-grope .control-item.role-label {
-    width: 150px;
     font-weight: bold;
+    margin-right: 5px;
 }
 
 .fxservice-calculator .response-panel .control-grope .control-item.role-text.down-amount {

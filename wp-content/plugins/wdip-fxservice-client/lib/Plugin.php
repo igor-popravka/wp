@@ -162,7 +162,7 @@ class Plugin {
 
     public function ajaxCalculateGrowthData() {
         $request = new Request();
-        if ($request->validate(['accountId', 'startDate', 'investAmount', 'interestRate'])) {
+        if ($request->validate(['accountId', 'startDate', 'investAmount', 'performanceFee'])) {
             $request->calculate = true;
             $option = new CalculatorForm($request->getSource());
             

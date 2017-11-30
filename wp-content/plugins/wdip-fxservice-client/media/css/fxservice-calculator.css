@@ -20,7 +20,7 @@
     border: 1px solid #ccc;
     color: #666;
     padding: 3px 6px;
-    width: 140px;
+    width: 120px;
     height: 28px;
     margin: 0;
     font-size: 12px;
@@ -30,19 +30,26 @@
     border: 1px solid #ccc;
     color: #666;
     padding: 3px 6px;
-    width: 140px;
+    width: 120px;
     height: 28px;
     margin: 0;
     font-size: 12px;
 }
 
+.fxservice-calculator .data-panel .control-grope label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 3px;
+}
+
 .fxservice-calculator .data-panel .button-grope {
     display: inline-block;
     float: right;
+    margin: 20px 0 0 5px;
 }
 
 .fxservice-calculator .data-panel .valid-error {
-    border-color: red!important;
+    border-color: red !important;
 }
 
 .fxservice-calculator .data-panel .button-grope input {

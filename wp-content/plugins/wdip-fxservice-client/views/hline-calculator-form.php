@@ -9,19 +9,28 @@ $options = $this->getOptions();
     <div class="data-panel">
         <form>
             <div class="control-grope">
-                <input type="text" name="investAmount" placeholder="Investment amount">
+                <label>Investment amount</label>
+                <input type="text" name="investAmount" placeholder="0.00">
             </div>
             <div class="control-grope">
-                <input type="text" name="startDate" placeholder="Start date">
+                <label>Start date</label>
+                <input type="text" name="startDate" placeholder="yyyy-mm-dd">
             </div>
             <div class="control-grope">
-                <select name="interestRate">
-                    <option value="0">Interest rate</option>
+                <label>Performance fee</label>
+                <select name="performanceFee">
+                    <option value="0" selected>0%</option>
                 </select>
             </div>
+
             <div class="button-grope">
-                <input type="submit" value="Calculate">
+                <input type="submit" value="Calculate" name="submit">
             </div>
+            
+            <div class="button-grope">
+                <input type="button" value="Reset" name="reset">
+            </div>
+            
         </form>
     </div>
 

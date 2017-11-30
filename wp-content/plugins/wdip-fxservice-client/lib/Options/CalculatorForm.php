@@ -14,7 +14,7 @@ use WDIP\Plugin\Services;
  * @property $feeList
  *
  * @property $investAmount
- * @property $interestRate
+ * @property $performanceFee
  * @property $startDate
  *
  * @property $totalAmount
@@ -125,7 +125,7 @@ class CalculatorForm extends AbstractOptions {
             $result['categories'] = array_keys($data);
 
             $amount = floatval($this->investAmount);
-            $fee = floatval($this->interestRate);
+            $fee = floatval($this->performanceFee / 100);
             foreach ($data as $val) {
                 $gain_amount = round(($amount * ($val[1] / 100)), 2);
                 $fee_amount = round(abs($gain_amount) * $fee, 2);

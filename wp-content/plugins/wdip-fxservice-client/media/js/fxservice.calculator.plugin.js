@@ -1,6 +1,16 @@
 (function ($) {
     $.fn.FXServiceCalculator = function (options) {
         var plugin = this;
+
+        options.temp = '<ul>\
+            <li><a href="#total-chart-' + options.uid + '">Total amount</a></li>\
+            <li><a href="#gl-chart-' + options.uid + '">Gain/Loss amount</a></li>\
+            <li><a href="#fee-chart-' + options.uid + '">Fee amount</a></li>\
+        </ul>\
+        <div id="total-chart-' + options.uid + '"></div>\
+        <div id="gl-chart-' + options.uid + '"></div>\
+        <div id="fee-chart-' + options.uid + '"></div>';
+
         plugin.prop('options', options);
         plugin.prop('params', {});
         plugin.prop('methods', {
@@ -68,7 +78,7 @@
                 });
 
                 if (plugin.prop('methods').validate(false)) {
-                    plugin.prop('methods').calculate();  
+                    plugin.prop('methods').calculate();
                 }
             },
             saveParam: function (name, value) {
@@ -87,7 +97,10 @@
                     function (result) {
                         var data = result.success ? result.data : {};
                         plugin.prop('methods').update(data);
-                        callback();
+
+                        if (typeof callback != 'undefined') {
+                            callback();
+                        }
                     }
                 );
             },
@@ -114,20 +127,23 @@
                         $(".gain-loss-amount", plugin).removeClass('up-amount').addClass('down-amount');
                     }
 
-                    plugin.prop('options').chartOptions = data.chartOptions;
+                    plugin.prop('options').totalChartOptions = data.totalChartOptions;
+                    plugin.prop('options').glChartOptions = data.glChartOptions;
+                    plugin.prop('options').feeChartOptions = data.feeChartOptions;
+
                     plugin.prop('methods').showChats();
                 } else {
-                    var options = plugin.prop('options').chartOptions;
-                    options.series = [];
+                    plugin.prop('options').totalChartOptions.series = [];
+                    plugin.prop('options').glChartOptions.series = [];
+                    plugin.prop('options').feeChartOptions.series = [];
 
                     $('input[name="investAmount"]', plugin).val(null);
                     $('input[name="startDate"]', plugin).val(null);
                     $('select[name="performanceFee"]', plugin).val(0);
 
-                    plugin.prop('options').chartOptions = options;
                     plugin.prop('methods').showChats();
 
-                    $('.chart-panel', plugin).text('Calculation Result Graph');
+                    $('.chart-panel', plugin).html(null).text('Calculation Result Graph');
 
                     $(".response-panel .role-text", plugin).each(function () {
                         $(this).text('0.00').removeClass('down-amount').removeClass('up-amount');
@@ -135,18 +151,24 @@
                 }
             },
             showChats: function () {
-                var chart = $('.chart-panel', plugin);
-                Highcharts.chart(chart[0], plugin.prop('options').chartOptions);
+                var chart_panel = $('.chart-panel', plugin),
+                    options = plugin.prop('options');
+
+                chart_panel.html(options.temp).tabs();
+
+                Highcharts.chart($('#total-chart-' + options.uid, chart_panel)[0], options.totalChartOptions);
+                Highcharts.chart($('#gl-chart-' + options.uid, chart_panel)[0], options.glChartOptions);
+                Highcharts.chart($('#fee-chart-' + options.uid, chart_panel)[0], options.feeChartOptions);
             },
             validate: function (display) {
                 var valid = true;
                 display = (typeof display != 'undefined') ? display : true;
-                
+
                 $("form input, form select", plugin).each(function () {
                     if (!$(this).val().length || $(this).val() == 0) {
                         valid = false;
-                        if(display){
-                            $(this).addClass('valid-error');  
+                        if (display) {
+                            $(this).addClass('valid-error');
                         }
                     }
                 });

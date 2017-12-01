@@ -191,6 +191,7 @@ class Plugin {
             'jquery-ui-dialog',
             'jquery-ui-datepicker',
             'jquery-ui-button',
+            'jquery-ui-tabs',
             'highcharts'
         ], $this->getVersion());
         wp_enqueue_style('jquery-ui-slider-css', '//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');

@@ -22,6 +22,9 @@ use WDIP\Plugin\Services;
  * @property $gainLosAmount
  *
  * @property $chartOptions
+ * @property $totalChartOptions
+ * @property $glChartOptions
+ * @property $feeChartOptions
  */
 class CalculatorForm extends AbstractOptions {
     protected function generate(array $data) {
@@ -29,28 +32,59 @@ class CalculatorForm extends AbstractOptions {
 
         $data = $this->calculate($data);
 
-        $chart_options = Services::config()->CALCULATOR_CHART_OPTIONS;
-        $chart_options['xAxis']['categories'] = $data['categories'];
+        $total_chart_options = Services::config()->CALCULATOR_TOTAL_CHART_OPTIONS;
+        $total_chart_options['xAxis']['categories'] = $data['categories'];
 
-        $series = json_decode('[' . implode(',', (array)$chart_options['series']) . ']', true);
-        $series[0]['data'] = $data['total_series_data'];
-        $series[1]['data'] = $data['gain_los_series_data'];
-        $series[2]['data'] = $data['fee_series_data'];
-        $chart_options['series'] = $series;
+        $series = $total_chart_options['series'];
+        $series['data'] = $data['total_series_data'];
 
-        if (!empty($this->title)) {
-            $chart_options['title']['text'] = $this->title;
-        }
+        $total_chart_options['series'] = [$series];
 
         if (!empty($this->backgroundColor)) {
-            $chart_options['chart']['backgroundColor'] = $this->backgroundColor;
+            $total_chart_options['chart']['backgroundColor'] = $this->backgroundColor;
         }
 
         if (!empty($this->gridLineColor)) {
-            $chart_options['yAxis']['gridLineColor'] = $this->gridLineColor;
+            $total_chart_options['yAxis']['gridLineColor'] = $this->gridLineColor;
         }
 
-        $this->chartOptions = $chart_options;
+        $this->totalChartOptions = $total_chart_options;
+
+        $gl_chart_options = Services::config()->CALCULATOR_GL_CHART_OPTIONS;
+        $gl_chart_options['xAxis']['categories'] = $data['categories'];
+
+        $series = $gl_chart_options['series'];
+        $series['data'] = $data['gain_los_series_data'];
+
+        $gl_chart_options['series'] = [$series];
+
+        if (!empty($this->backgroundColor)) {
+            $gl_chart_options['chart']['backgroundColor'] = $this->backgroundColor;
+        }
+
+        if (!empty($this->gridLineColor)) {
+            $gl_chart_options['yAxis']['gridLineColor'] = $this->gridLineColor;
+        }
+
+        $this->glChartOptions = $gl_chart_options;
+
+        $fee_chart_options = Services::config()->CALCULATOR_FEE_CHART_OPTIONS;
+        $fee_chart_options['xAxis']['categories'] = $data['categories'];
+
+        $series = $fee_chart_options['series'];
+        $series['data'] = $data['fee_series_data'];
+
+        $fee_chart_options['series'] = [$series];
+
+        if (!empty($this->backgroundColor)) {
+            $fee_chart_options['chart']['backgroundColor'] = $this->backgroundColor;
+        }
+
+        if (!empty($this->gridLineColor)) {
+            $fee_chart_options['yAxis']['gridLineColor'] = $this->gridLineColor;
+        }
+
+        $this->feeChartOptions = $fee_chart_options;
 
         $this->totalAmount = $data['total_amount'];
         $this->gainLosAmount = $data['gain_los_amount'];

@@ -17,6 +17,9 @@ class ShortCodeAttributes extends AbstractCollectionAttributes {
             'grid-line-color' => ['required' => false, 'default' => '#465D86', 'type' => Attribute::TYPE_STRING],
             'title' => ['required' => false, 'default' => '', 'type' => Attribute::TYPE_STRING],
             'fee-list' => ['required' => false, 'default' => '', 'type' => Attribute::TYPE_LIST],
+            'performance-fee' => ['required' => false, 'default' => '25', 'type' => Attribute::TYPE_STRING],
+            'start-date' => ['required' => false, 'default' => (new \DateTime())->modify('-6 month')->format('Y-m-d'), 'type' => Attribute::TYPE_STRING],
+            'invest-amount' => ['required' => false, 'default' => '1000', 'type' => Attribute::TYPE_STRING],
         ];
     }
 }

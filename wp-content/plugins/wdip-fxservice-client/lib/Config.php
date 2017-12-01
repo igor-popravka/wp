@@ -5,7 +5,9 @@ namespace WDIP\Plugin;
  * @property int version
  * @property array SETTINGS
  * @property array FXSERVICE_API
- * @property array CALCULATOR_CHART_OPTIONS
+ * @property array CALCULATOR_TOTAL_CHART_OPTIONS
+ * @property array CALCULATOR_GL_CHART_OPTIONS
+ * @property array CALCULATOR_FEE_CHART_OPTIONS
  */
 class Config extends ObjectData {
     private static $instance;

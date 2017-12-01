@@ -1,4 +1,5 @@
 <?php
+
 namespace WDIP\Plugin\Attributes;
 
 
@@ -25,12 +26,14 @@ abstract class AbstractCollectionAttributes implements \Iterator {
             if ($this->has($name)) {
                 $attr = $this->get($name);
                 $attr->setValue($value);
-
-                if ($attr->isEmpty()) {
-                    $attr->setValue($attr->getDefault());
-                }
+            } else if ($this->has($value)) {
+                $attr = $this->get($value);
             } else {
                 $attr = new Attribute($name, $value);
+            }
+
+            if ($attr->isEmpty()) {
+                $attr->setValue($attr->getDefault());
             }
 
             $this->add($attr);

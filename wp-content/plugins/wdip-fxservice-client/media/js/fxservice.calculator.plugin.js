@@ -19,6 +19,7 @@
                     start = $('input[name="startDate"]', plugin),
                     invest = $('input[name="investAmount"]', plugin),
                     submit = $('input[type="submit"]', plugin),
+                    chart_panel = $('.chart-panel', plugin),
                     options = plugin.prop('options');
 
                 $(options.feeList).each(function (i, val) {
@@ -80,12 +81,32 @@
                 if (plugin.prop('methods').validate(false)) {
                     plugin.prop('methods').calculate();
                 }
+
+                chart_panel.html(options.temp).tabs();
+
+                plugin.prop('methods').showSpinner();
+
+                $(".spinner", chart_panel).show();
+
+                $('a[href="#total-chart-' + options.uid + '"]', chart_panel).on('click', function () {
+                    Highcharts.chart($($(this).attr('href'))[0], options.totalChartOptions);
+                });
+
+                $('a[href="#gl-chart-' + options.uid + '"]', chart_panel).on('click', function () {
+                    Highcharts.chart($($(this).attr('href'))[0], options.glChartOptions);
+                });
+
+                $('a[href="#fee-chart-' + options.uid + '"]', chart_panel).on('click', function () {
+                    Highcharts.chart($($(this).attr('href'))[0], options.feeChartOptions);
+                });
             },
             saveParam: function (name, value) {
                 plugin.prop('params')[name] = value;
             },
             calculate: function (callback) {
                 var options = plugin.prop('options');
+
+                plugin.prop('methods').showSpinner();
 
                 $.post(
                     options.adminUrl,
@@ -131,7 +152,7 @@
                     plugin.prop('options').glChartOptions = data.glChartOptions;
                     plugin.prop('options').feeChartOptions = data.feeChartOptions;
 
-                    plugin.prop('methods').showChats();
+                    $('a[href^="#total-chart-"]', plugin).click();
                 } else {
                     plugin.prop('options').totalChartOptions.series = [];
                     plugin.prop('options').glChartOptions.series = [];
@@ -141,24 +162,21 @@
                     $('input[name="startDate"]', plugin).val(null);
                     $('select[name="performanceFee"]', plugin).val(0);
 
-                    plugin.prop('methods').showChats();
-
-                    $('.chart-panel', plugin).html(null).text('Calculation Result Graph');
+                    $('a[href^="#total-chart-"]', plugin).click();
 
                     $(".response-panel .role-text", plugin).each(function () {
                         $(this).text('0.00').removeClass('down-amount').removeClass('up-amount');
                     });
                 }
             },
-            showChats: function () {
-                var chart_panel = $('.chart-panel', plugin),
-                    options = plugin.prop('options');
+            showSpinner: function () {
+                var options = plugin.prop('options'),
+                    spinner = $('<div class="spinner"></div>'),
+                    tab = $('#total-chart-' + options.uid, plugin);
 
-                chart_panel.html(options.temp).tabs();
+                tab.html(spinner);
 
-                Highcharts.chart($('#total-chart-' + options.uid, chart_panel)[0], options.totalChartOptions);
-                Highcharts.chart($('#gl-chart-' + options.uid, chart_panel)[0], options.glChartOptions);
-                Highcharts.chart($('#fee-chart-' + options.uid, chart_panel)[0], options.feeChartOptions);
+                spinner.css({"margin-left": tab.width() * 0.5 - 32}).show();
             },
             validate: function (display) {
                 var valid = true;

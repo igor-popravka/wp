@@ -98,3 +98,13 @@
 .fxservice-calculator .response-panel .control-grope .control-item.role-text.up-amount {
     color: darkgreen;
 }
+
+.spinner {
+    background: url('/wp-admin/images/wpspin_light-2x.gif') no-repeat;
+    background-size: 32px 32px;
+    display: none;
+    opacity: .6;
+    filter: alpha(opacity=70);
+    width: 32px;
+    height: 32px;
+}

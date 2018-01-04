@@ -110,10 +110,10 @@
 }
 
 .fxservice-calculator .chart-panel a.ui-tabs-anchor {
-    color: #ffffff!important;
+    color: #000000!important;
 }
 
-.fxservice-calculator .chart-panel .ui-tabs .ui-tabs-nav li {
+.fxservice-calculator .chart-panel.ui-tabs .ui-tabs-nav li {
     list-style: none;
     float: left!important;
     position: relative;

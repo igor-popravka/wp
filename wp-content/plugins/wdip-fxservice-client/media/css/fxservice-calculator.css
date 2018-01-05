@@ -110,7 +110,8 @@
 }
 
 .fxservice-calculator .chart-panel a.ui-tabs-anchor {
-    color: #000000!important;
+    color: #1E87AA!important;
+    padding: 7px 30px !important
 }
 
 .fxservice-calculator .chart-panel.ui-tabs .ui-tabs-nav li {
@@ -124,4 +125,8 @@
     white-space: nowrap;
     border-top-right-radius: 3px;
     border-top-left-radius: 3px;
+}
+
+.fxservice-calculator .chart-panel li.ui-tabs-active.ui-state-active{
+    background: none!important;
 }

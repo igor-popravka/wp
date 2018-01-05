@@ -59,7 +59,7 @@
 }
 
 .fxservice-calculator .chart-panel {
-    min-height: 290px;
+    min-height: 200px;
     background: none;
     color: #ccc;
     font-weight: bold;
@@ -114,6 +114,14 @@
     padding: 7px 30px !important
 }
 
+.fxservice-calculator .chart-panel.ui-tabs {
+    margin: 0!important;
+}
+
+.fxservice-calculator .chart-panel .ui-tabs-panel{
+    padding: 15px 0 0 0;
+}
+
 .fxservice-calculator .chart-panel.ui-tabs .ui-tabs-nav li {
     list-style: none;
     float: left!important;
@@ -128,5 +136,9 @@
 }
 
 .fxservice-calculator .chart-panel li.ui-tabs-active.ui-state-active{
-    background: none!important;
+    background: #1E87AA!important;
+}
+
+.fxservice-calculator .chart-panel li.ui-tabs-active.ui-state-active a.ui-tabs-anchor{
+    color: #ffffff!important;
 }

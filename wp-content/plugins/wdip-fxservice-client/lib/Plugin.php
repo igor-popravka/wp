@@ -179,14 +179,7 @@ class Plugin {
             'jquery-ui-slider',
             'highcharts'
         ], $this->getVersion());
-        /*wp_enqueue_script('wdip-myfxbook-calculator', Services::system()->getJsURL('wdip-myfxbook.calculator'), [
-            'jquery',
-            'jquery-ui-dialog',
-            'jquery-ui-datepicker',
-            'jquery-ui-button',
-            'highcharts'
-        ], $this->getVersion());*/
-        wp_enqueue_script('fxservice-calculator-plugin', Services::system()->getJsURL('fxservice.calculator.plugin'), [
+        wp_enqueue_script('fxservice-calculator-plugin', Services::system()->getJsURL('fxservice.calculator.plugin.min'), [
             'jquery',
             'jquery-ui-dialog',
             'jquery-ui-datepicker',

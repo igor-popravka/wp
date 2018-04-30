@@ -9,16 +9,18 @@ $options = $this->getOptions();
     <div class="data-panel">
         <form>
             <div class="control-grope">
-                <label>Investment amount</label>
-                <input type="text" name="investAmount" placeholder="0.00">
+                <label for="fxs-calc-invest-amount-<?= $options->uid; ?>">Investment amount</label>
+                <input id="fxs-calc-invest-amount-<?= $options->uid; ?>" type="text" name="investAmount"
+                       placeholder="0.00">
             </div>
             <div class="control-grope">
-                <label>Start date</label>
-                <input type="text" name="startDate" placeholder="yyyy-mm-dd">
+                <label for="fxs-calc-start-date-<?= $options->uid; ?>">Start date</label>
+                <input id="fxs-calc-start-date-<?= $options->uid; ?>" type="text" name="startDate"
+                       placeholder="yyyy-mm-dd">
             </div>
             <div class="control-grope">
-                <label>Performance fee</label>
-                <select name="performanceFee">
+                <label for="fxs-calc-performance-fee-<?= $options->uid; ?>">Performance fee</label>
+                <select id="fxs-calc-performance-fee-<?= $options->uid; ?>" name="performanceFee">
                     <option value="0" selected>0%</option>
                 </select>
             </div>
@@ -26,15 +28,30 @@ $options = $this->getOptions();
             <div class="button-grope">
                 <input type="submit" value="Calculate" name="submit">
             </div>
-            
+
             <div class="button-grope">
                 <input type="button" value="Reset" name="reset">
             </div>
-            
+
         </form>
     </div>
 
-    <div class="chart-panel">Calculation Result Graph</div>
+    <div class="chart-panel">
+        <div id="fxs-calc-default-text-<?= $options->uid; ?>" style="padding-top: 2%">Nothing to display. Please change default configuration or enter filter data.</div>
+
+        <div id="fxs-calc-spinner-<?= $options->uid; ?>" hidden><span class="spinner"></span></div>
+
+        <div id="fxs-calc-charts-<?= $options->uid; ?>" hidden>
+            <ul>
+                <li><a href="#total-chart-<?= $options->uid; ?>">Total amount</a></li>
+                <li><a href="#gl-chart-<?= $options->uid; ?>">Gain/Loss amount</a></li>
+                <li><a href="#fee-chart-<?= $options->uid; ?>">Fee amount</a></li>
+            </ul>
+            <div id="total-chart-<?= $options->uid; ?>"></div>
+            <div id="gl-chart-<?= $options->uid; ?>"></div>
+            <div id="fee-chart-<?= $options->uid; ?>"></div>
+        </div>
+    </div>
 
     <div class="response-panel">
         <div class="control-grope border-right">

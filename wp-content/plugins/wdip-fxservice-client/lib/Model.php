@@ -25,7 +25,7 @@ class Model {
                 'api/get-daily-gain.json',
                 [
                     'session' => $this->getMyFXBookSession(),
-                    'id' => $account_id,
+                    'id' => $account_info->id,
                     'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
                     'end' => (new \DateTime())->format('Y-m-d')
                 ]
@@ -64,7 +64,7 @@ class Model {
                     [
                         'chartType' => 3,
                         'monthType' => 0,
-                        'accountOid' => $account_id,
+                        'accountOid' => $account_info->id,
                         'startDate' => "{$startYear}-01-01",
                         'endDate' => (new \DateTime())->format('Y-m-d')
                     ]
@@ -92,7 +92,7 @@ class Model {
     public function getMyFXBookAccountInfo($account_id) {
         if ($accounts = $this->getMyFXBookAccounts()) {
             foreach ($accounts as $acc) {
-                if ($acc->id == $account_id) {
+                if ($acc->id == $account_id || $acc->accountId == $account_id) {
                     return $acc;
                 }
             }
@@ -112,7 +112,7 @@ class Model {
                 'api/get-gain.json',
                 [
                     'session' => $this->getMyFXBookSession(),
-                    'id' => $account_id,
+                    'id' => $account_info->id,
                     'start' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->firstTradeDate)->format('Y-m-d'),
                     'end' => \DateTime::createFromFormat('m/d/Y H:i', $account_info->lastUpdateDate)->format('Y-m-d')
                 ]
